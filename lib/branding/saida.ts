@@ -213,9 +213,13 @@ export async function marcaDaSaida(organizationId: string | null): Promise<Marca
       },
     };
   } catch (erro) {
-    avisarUmaVez("resolucao|excecao", "marca de saída: resolução falhou; vale o padrão do produto", {
-      detalhe: erro instanceof Error ? erro.message : String(erro),
-    });
+    avisarUmaVez(
+      "resolucao|excecao",
+      "marca de saída: resolução falhou; vale o padrão do produto",
+      {
+        detalhe: erro instanceof Error ? erro.message : String(erro),
+      },
+    );
     return padraoDoProduto();
   }
 }
@@ -228,12 +232,10 @@ export async function marcaDaSaida(organizationId: string | null): Promise<Marca
  * de conta suspensa, quem suspendeu foi o revendedor — mandar o cliente dele
  * escrever para nós entrega o cliente e não resolve o problema dele.
  *
- * Só o `.env` por enquanto. A coluna que permitiria trocar isto pela tela
- * (`platform_branding.support_email`) exige migration + apêndice no
- * `baseline.sql`, e schema não entra nesta mudança — está declarado no handoff
- * desta fase. Quando entrar, esta função ganha a linha do banco ACIMA do
- * ambiente, na mesma ordem que a marca já usa.
+ * O banco fica acima do `.env`, como nos demais campos da marca. A leitura da
+ * marca nunca lança; schema antigo ou banco indisponivel cai no ambiente.
  */
-export function emailDeSuporte(): string {
-  return env.SUPPORT_EMAIL.trim();
+export async function emailDeSuporte(): Promise<string> {
+  const linha = await marcaDaInstalacao();
+  return linha?.support_email?.trim() || env.SUPPORT_EMAIL.trim();
 }

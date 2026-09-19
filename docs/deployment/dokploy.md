@@ -65,6 +65,7 @@ resolucao do compose antes que uma stack parcialmente configurada seja criada.
 | `WAHA_BYO_ENCRYPTION_KEY`       | cifra de credencial WAHA por org   | `openssl rand -base64 32`   |
 | `AI_CRED_AES_KEY`               | cifra de credenciais de IA         | `openssl rand -base64 32`   |
 | `IMPERSONATE_COOKIE_SECRET`     | cookie de suporte temporario       | `openssl rand -hex 32`      |
+| `SETUP_TOKEN`                   | autoriza o primeiro acesso a setup | `openssl rand -hex 32`      |
 | `LGPD_SIGNING_KEY`              | assinatura de exportacoes LGPD     | `openssl rand -hex 32`      |
 | `WAHA_API_KEY`                  | plaintext enviado pelo app ao WAHA | `openssl rand -hex 32`      |
 | `WAHA_API_KEY_SHA512`           | hash recebido pelo WAHA            | comando abaixo              |
@@ -89,9 +90,9 @@ Nuvemshop, Meta, Zernio, Resend/SMTP, web push, Sentry, voz e knobs de retencao.
 Valor vazio mantem a integracao desligada quando o contrato em `lib/env.ts`
 permite isso.
 
-Branding inicial usa `APP_NAME`, `APP_LOGO_URL`, `APP_ACCENT_HEX`, `APP_LOCALE`
-e `SUPPORT_EMAIL`. Depois da primeira gravacao, o banco e a superficie de
-administracao sao a fonte de verdade; as envs ficam como fallback de rollback.
+`APP_NAME`, `APP_LOGO_URL`, `APP_ACCENT_HEX`, `APP_LOCALE` e `SUPPORT_EMAIL`
+continuam como fallback de rollback. O assistente grava nome, logo, cor e email
+de suporte no banco, que passa a ser a fonte de verdade.
 
 `SUPABASE_DB_ADMIN_URL` e opcional no runtime e nao e usada para migrations pelo
 app. Se uma pipeline de banco precisar dela, mantenha a credencial somente nessa
@@ -99,13 +100,22 @@ pipeline, fora dos containers da aplicacao sempre que possivel.
 
 ## Primeiro administrador
 
-Nesta etapa da branch, o compose ja e reproduzivel, mas o setup visual ainda
-esta em implementacao. Ate a etapa de setup ser concluida, a criacao inicial do
-dono continua seguindo as regras de `scripts/bootstrap-owner.ts`. Nao mantenha
-`OWNER_PASSWORD` como variavel permanente do Dokploy.
+1. Gere `SETUP_TOKEN` com `openssl rand -hex 32` e cadastre o valor no Dokploy.
+2. Depois que o deploy e o schema estiverem prontos, abra `/setup` no dominio.
+3. Autorize o navegador com o token e informe administrador, primeira empresa
+   e marca da instalacao.
+4. Conclua a instalacao e entre em `/login` com a conta criada.
 
-Quando o setup visual entrar, esta secao sera substituida pelo fluxo protegido
-de `/setup`, e uma atualizacao normal nunca executara o bootstrap novamente.
+O token nunca vai em URL. Ele e trocado por um cookie `HttpOnly`, `Secure` em
+producao, `SameSite=Strict`, com vinte minutos de validade. A conclusao cria a
+organizacao, o vinculo, o administrador de plataforma e a marca numa transacao.
+Se a transacao falhar, o usuario Auth recem-criado e removido.
+
+Depois da conclusao, `/setup` e suas APIs respondem como inexistentes. Uma
+instalacao atualizada que ja possua administrador tambem e marcada como
+concluida pela migration; portanto o deploy de uma versao nova nao reabre o
+assistente. Rotacione ou remova `SETUP_TOKEN` do ambiente depois do primeiro
+acesso como higiene operacional, embora o banco seja a trava definitiva.
 
 ## Persistencia e backup
 

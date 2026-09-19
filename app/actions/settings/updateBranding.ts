@@ -9,9 +9,7 @@ import { normalizarHex } from "@/lib/branding/rampa";
 import { platformBrandingSchema, type PlatformBrandingInput } from "@/lib/schemas/settings";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-export type UpdateBrandingResult =
-  | { ok: true }
-  | { ok: false; error: string; details?: unknown };
+export type UpdateBrandingResult = { ok: true } | { ok: false; error: string; details?: unknown };
 
 /**
  * Troca a marca da INSTALAÇÃO — nome, logo, cor e o selo — sem SSH e sem
@@ -69,9 +67,7 @@ export type UpdateBrandingResult =
  * anti-pattern nº 3 do CLAUDE.md. O registro desta mutação é o `audit()` abaixo,
  * que tem consumidor real (`/admin/audit`).
  */
-export async function updateBranding(
-  input: PlatformBrandingInput,
-): Promise<UpdateBrandingResult> {
+export async function updateBranding(input: PlatformBrandingInput): Promise<UpdateBrandingResult> {
   const parsed = platformBrandingSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: "validation_failed", details: parsed.error.flatten() };
@@ -86,6 +82,7 @@ export async function updateBranding(
 
   const valores = {
     app_name: parsed.data.app_name,
+    support_email: parsed.data.support_email,
     logo_url: parsed.data.logo_url,
     // Normaliza porque o CHECK do banco é `^#[0-9a-f]{6}$`: `#FFF` e `#FFFFFF`
     // passam pelo Zod (o validador do domínio aceita as duas formas) e só um dos

@@ -19,7 +19,7 @@ export const metadata = {
  * seria o defeito de volta, com o agravante de parecer resolvido.
  */
 export default async function AccountSuspendedPage() {
-  const suporte = emailDeSuporte();
+  const suporte = await emailDeSuporte();
   // Rota fora da árvore de `app/app/layout.tsx` — sem `IdiomaProvider`, então
   // resolve o idioma direto, como `admin/forbidden/page.tsx`. Quem chega aqui
   // normalmente tem sessão do Supabase Auth (a suspensão é regra do produto,
@@ -28,20 +28,18 @@ export default async function AccountSuspendedPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const idioma = normalizarIdioma(
-    (user?.user_metadata?.locale as string | undefined) ?? null,
-  );
+  const idioma = normalizarIdioma((user?.user_metadata?.locale as string | undefined) ?? null);
 
   return (
     <main className="flex min-h-screen items-center justify-center p-8">
-      <Card className="w-full max-w-md p-8 text-center space-y-4">
+      <Card className="w-full max-w-md space-y-4 p-8 text-center">
         <h1 className="text-2xl font-semibold">{traduzir("Conta suspensa", idioma)}</h1>
         {suporte ? (
           <p className="text-sm text-muted-foreground">
             {traduzir("Sua conta está suspensa. Entre em contato com", idioma)}{" "}
             <a
               href={`mailto:${suporte}`}
-              className="underline underline-offset-4 hover:text-foreground transition-colors"
+              className="underline underline-offset-4 transition-colors hover:text-foreground"
             >
               {suporte}
             </a>{" "}

@@ -6,6 +6,11 @@ export const PUBLIC_PATHS: RegExp[] = [
   /^\/$/,
   /^\/login(\/.*)?$/,
   /^\/signup$/,
+  // Assistente de primeira instalacao. O proxy nao autentica porque ainda nao
+  // existe usuario; token e cookie HMAC sao conferidos dentro das duas rotas.
+  // As ancoras impedem que subpaths futuros nascam publicos de carona.
+  /^\/setup$/,
+  /^\/api\/v1\/setup\/(session|complete)$/,
   /^\/auth\/confirm$/,
   /^\/403$/,
   /^\/admin\/forbidden$/,

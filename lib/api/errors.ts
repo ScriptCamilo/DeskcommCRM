@@ -19,6 +19,8 @@ export const ApiErrorCodes = {
   token_expired: "token_expired",
   token_revoked: "token_revoked",
   invalid_credentials: "invalid_credentials",
+  setup_token_invalid: "setup_token_invalid",
+  setup_session_invalid: "setup_session_invalid",
   mfa_required: "mfa_required",
   auth_in_query_forbidden: "auth_in_query_forbidden",
 
@@ -65,6 +67,7 @@ export const ApiErrorCodes = {
   state_conflict: "state_conflict",
   invalid_state: "invalid_state", // resposta a um agent_case que saiu de awaiting_human (spec 15 §7)
   tenant_already_exists: "tenant_already_exists",
+  setup_already_completed: "setup_already_completed",
   // POST /api/v1/contacts com telefone já cadastrado na mesma organização
   // (índice uniq_contacts_org_phone). O corpo traz `details.contact_id` para a
   // tela oferecer o contato existente em vez de só mostrar que deu erro.

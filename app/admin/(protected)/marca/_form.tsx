@@ -24,6 +24,7 @@ import { useT } from "@/hooks/i18n/useT";
 
 export interface MarcaGravada {
   readonly app_name: string | null;
+  readonly support_email: string | null;
   readonly logo_url: string | null;
   /**
    * O ARQUIVO subido pela tela. Não vai no `Salvar`: tem rota própria
@@ -77,6 +78,7 @@ export function FormularioDaMarca({
   const t = useT();
   const router = useRouter();
   const [nome, setNome] = useState(gravada.app_name ?? "");
+  const [emailDeSuporte, setEmailDeSuporte] = useState(gravada.support_email ?? "");
   const [hex, setHex] = useState(gravada.accent_hex ?? "");
   const [erroTecnico, setErroTecnico] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -166,6 +168,7 @@ export function FormularioDaMarca({
 
     const candidato: PlatformBrandingInput = {
       app_name: nome.trim() || null,
+      support_email: emailDeSuporte.trim() || null,
       // `logo_url` volta COMO ESTÁ, e continua não sendo editável aqui: ele é a
       // URL colada no arquivo de instalação (`APP_LOGO_URL`), que sobrevive como
       // rede de rollback — o `agent.sh` reverte a imagem, nunca o banco. O que a
@@ -255,6 +258,23 @@ export function FormularioDaMarca({
         <p className="text-xs text-text-muted">
           {t(
             "Deixe em branco para voltar ao nome padrão. Este nome já aparece no título da aba do navegador, nos menus laterais, nos e-mails que o sistema envia (para as empresas que não definiram um nome próprio), no aplicativo de verificação em duas etapas e no arquivo de códigos de recuperação que o usuário baixa. Ainda NÃO chega às telas de entrada e cadastro nem às da configuração inicial: essas continuam com o nome gravado no arquivo de instalação do servidor até a próxima atualização da stack.",
+          )}
+        </p>
+      </Card>
+
+      <Card className="space-y-2 p-6">
+        <Label htmlFor="support_email">{t("Email de suporte")}</Label>
+        <Input
+          id="support_email"
+          type="email"
+          value={emailDeSuporte}
+          onChange={(event) => setEmailDeSuporte(event.target.value)}
+          maxLength={200}
+          autoComplete="email"
+        />
+        <p className="text-xs text-text-muted">
+          {t(
+            "Aparece para clientes em telas de conta e cobranca. Deixe em branco para usar o valor do arquivo de instalacao.",
           )}
         </p>
       </Card>

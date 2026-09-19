@@ -166,9 +166,7 @@ export const customFieldSchema = z.object({
     "url",
   ]),
   required: z.boolean().optional(),
-  options: z
-    .array(z.object({ value: z.string().min(1), label: z.string().min(1) }))
-    .optional(),
+  options: z.array(z.object({ value: z.string().min(1), label: z.string().min(1) })).optional(),
 });
 export type CustomFieldDef = z.infer<typeof customFieldSchema>;
 
@@ -201,6 +199,7 @@ export type PipelineConfigPatch = z.infer<typeof pipelineConfigPatchSchema>;
  */
 export const platformBrandingSchema = z.object({
   app_name: z.string().trim().min(1).max(120).nullable(),
+  support_email: z.string().trim().email().max(200).nullable(),
   logo_url: z.string().trim().url().max(2048).nullable(),
   accent_hex: z
     .string()
@@ -241,24 +240,32 @@ export const marcaDaOrganizacaoSchema = z.object({
 export type MarcaDaOrganizacaoInput = z.infer<typeof marcaDaOrganizacaoSchema>;
 
 /** Prazos por organização. Leitura legada degrada; escrita usa schema estrito. */
-export const agendaSettingsWriteSchema = z.strictObject({
-  confirmation_delay_minutes: z.number().int().min(1).max(10080),
-  unknown_protection_minutes: z.number().int().min(1).max(10080),
-  /**
-   * Quanto tempo um pedido não confirmado segura o horário.
-   *
-   * ⚠️ `.default()` e não obrigatório: este schema é `strictObject`, e torná-lo
-   * exigido faria TODO PATCH já escrito (que manda só os dois campos de cima)
-   * passar a falhar — o tipo de mudança que a doutrina de packaging proíbe,
-   * porque quebra quem já instalou sem nenhum aviso.
-   *
-   * 24h é o default porque quem confere a fila uma vez por dia não pode perder
-   * pedido. O mínimo é 15 minutos: abaixo disso a expiração corre com quem está
-   * decidindo naquele instante.
-   */
-  pending_expires_after_minutes: z.number().int().min(15).max(10080).default(1440),
-}).refine(v => v.unknown_protection_minutes >= v.confirmation_delay_minutes, {message:"O prazo de proteção deve ser maior que o prazo de confirmação."});
-export const agendaSettingsSchema = agendaSettingsWriteSchema.catch({confirmation_delay_minutes:10,unknown_protection_minutes:1440,pending_expires_after_minutes:1440});
+export const agendaSettingsWriteSchema = z
+  .strictObject({
+    confirmation_delay_minutes: z.number().int().min(1).max(10080),
+    unknown_protection_minutes: z.number().int().min(1).max(10080),
+    /**
+     * Quanto tempo um pedido não confirmado segura o horário.
+     *
+     * ⚠️ `.default()` e não obrigatório: este schema é `strictObject`, e torná-lo
+     * exigido faria TODO PATCH já escrito (que manda só os dois campos de cima)
+     * passar a falhar — o tipo de mudança que a doutrina de packaging proíbe,
+     * porque quebra quem já instalou sem nenhum aviso.
+     *
+     * 24h é o default porque quem confere a fila uma vez por dia não pode perder
+     * pedido. O mínimo é 15 minutos: abaixo disso a expiração corre com quem está
+     * decidindo naquele instante.
+     */
+    pending_expires_after_minutes: z.number().int().min(15).max(10080).default(1440),
+  })
+  .refine((v) => v.unknown_protection_minutes >= v.confirmation_delay_minutes, {
+    message: "O prazo de proteção deve ser maior que o prazo de confirmação.",
+  });
+export const agendaSettingsSchema = agendaSettingsWriteSchema.catch({
+  confirmation_delay_minutes: 10,
+  unknown_protection_minutes: 1440,
+  pending_expires_after_minutes: 1440,
+});
 
 /**
  * `organizations.settings.crm` — regras de CRM que cada organização liga para si.
