@@ -127,6 +127,7 @@ acessibilidade).
 | [`deploy-selfhost/README.md`](deploy-selfhost/README.md) | Self-host genérico |
 | [`deploy-hostgator/README.md`](deploy-hostgator/README.md) | VPS HostGator (`install.sh`, `backup.sh`, `reset-mfa.sh`) |
 | [`deployment/scriptcamilo-discovery.md`](deployment/scriptcamilo-discovery.md) | Discovery e plano da distribuição ScriptCamilo |
+| [`deployment/dokploy.md`](deployment/dokploy.md) | Deploy da distribuição ScriptCamilo no Dokploy |
 | [`DEPLOY-CHECKLIST.md`](DEPLOY-CHECKLIST.md) | Checklist de deploy |
 | [`ATUALIZANDO.md`](ATUALIZANDO.md) | `update.sh`, `restore.sh`, `healthcheck.sh` |
 | [`runbooks/deploy.md`](runbooks/deploy.md) | **Deploy em produção — os dois `-f` do compose, verificação pós-deploy** |
