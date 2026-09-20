@@ -253,7 +253,7 @@ describe("emailDeSuporte", () => {
     else process.env.SUPPORT_EMAIL = original;
   });
 
-  it("prefere o endereço gravado na marca da instalação ao piso do ambiente", async () => {
+  it("preserva o endereço do setup visual acima do piso do ambiente", async () => {
     const original = process.env.SUPPORT_EMAIL;
     process.env.SUPPORT_EMAIL = "suporte-antigo@revenda.com.br";
     linhaDaInstalacao = { support_email: "  atendimento@revenda.com.br  " };

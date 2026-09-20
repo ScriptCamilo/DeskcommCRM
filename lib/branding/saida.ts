@@ -45,6 +45,7 @@
 
 import { DEFAULT_APP_NAME } from "@/lib/branding";
 import { env } from "@/lib/env";
+import { valorDaInstalacao } from "@/lib/instalacao/config";
 import { logger } from "@/lib/logger";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -232,10 +233,20 @@ export async function marcaDaSaida(organizationId: string | null): Promise<Marca
  * de conta suspensa, quem suspendeu foi o revendedor — mandar o cliente dele
  * escrever para nós entrega o cliente e não resolve o problema dele.
  *
- * O banco fica acima do `.env`, como nos demais campos da marca. A leitura da
- * marca nunca lança; schema antigo ou banco indisponivel cai no ambiente.
+ * A migration 0341 trouxe `platform_config`, que guarda uma linha por variável
+ * acima do arquivo de instalação. O campo histórico em `platform_branding`
+ * permanece como camada de compatibilidade para instalações que concluíram o
+ * setup visual antes de 0341: ele vence o `.env`, mas nunca uma escolha nova em
+ * `platform_config`. Assim, atualizar não apaga o contato que a pessoa já
+ * informou, e a fonte nova continua sendo a autoridade para mudanças futuras.
+ *
+ * Virou `async` porque o banco exige espera. O alcance foi medido antes: são
+ * duas páginas de servidor, ambas já assíncronas.
  */
 export async function emailDeSuporte(): Promise<string> {
+  const configuracao = await valorDaInstalacao("SUPPORT_EMAIL");
+  if (configuracao.fonte === "banco") return (configuracao.valor ?? "").trim();
+
   const linha = await marcaDaInstalacao();
-  return linha?.support_email?.trim() || env.SUPPORT_EMAIL.trim();
+  return linha?.support_email?.trim() || (configuracao.valor ?? "").trim();
 }
