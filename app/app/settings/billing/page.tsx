@@ -44,7 +44,12 @@ export default async function BillingPage() {
               .
             </>
           ) : (
-            <>{traduzir("Para questões de pagamento, fale com quem administra este sistema.", idioma)}</>
+            <>
+              {traduzir(
+                "Para questões de pagamento, fale com quem administra este sistema.",
+                idioma,
+              )}
+            </>
           )}
         </p>
       </Card>

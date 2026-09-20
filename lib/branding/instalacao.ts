@@ -72,6 +72,7 @@ import type { LinhaDaInstalacao } from "./resolve";
 
 /** A linha inteira de `platform_branding`. O resolvedor só conhece três campos. */
 export type LinhaDaMarca = LinhaDaInstalacao & {
+  readonly support_email: string | null;
   readonly show_powered_by: boolean;
   readonly seeded_from_env: boolean;
   readonly fallback_at: string | null;
@@ -102,7 +103,7 @@ export type SementeDoAmbiente = {
  * 0155; tratá-la diferente agora criaria duas regras para o mesmo caso.
  */
 const COLUNAS =
-  "app_name, logo_url, logo_path, accent_hex, show_powered_by, seeded_from_env, fallback_at, fallback_reason";
+  "app_name, logo_url, logo_path, accent_hex, support_email, show_powered_by, seeded_from_env, fallback_at, fallback_reason";
 
 /**
  * Códigos de recusa — os que significam "a cor configurada NÃO pintou".

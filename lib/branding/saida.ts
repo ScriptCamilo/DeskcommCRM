@@ -214,9 +214,13 @@ export async function marcaDaSaida(organizationId: string | null): Promise<Marca
       },
     };
   } catch (erro) {
-    avisarUmaVez("resolucao|excecao", "marca de saída: resolução falhou; vale o padrão do produto", {
-      detalhe: erro instanceof Error ? erro.message : String(erro),
-    });
+    avisarUmaVez(
+      "resolucao|excecao",
+      "marca de saída: resolução falhou; vale o padrão do produto",
+      {
+        detalhe: erro instanceof Error ? erro.message : String(erro),
+      },
+    );
     return padraoDoProduto();
   }
 }
@@ -229,16 +233,20 @@ export async function marcaDaSaida(organizationId: string | null): Promise<Marca
  * de conta suspensa, quem suspendeu foi o revendedor — mandar o cliente dele
  * escrever para nós entrega o cliente e não resolve o problema dele.
  *
- * O que a nota anterior aqui pedia — "quando a coluna entrar, esta função ganha
- * a linha do banco ACIMA do ambiente, na mesma ordem que a marca já usa" — é o
- * que esta versão faz. A migration 0341 trouxe `platform_config`, que guarda uma
- * linha por variável em vez de uma coluna por campo, e o resolvedor devolve a
- * ordem certa: banco acima, arquivo de instalação embaixo.
+ * A migration 0341 trouxe `platform_config`, que guarda uma linha por variável
+ * acima do arquivo de instalação. O campo histórico em `platform_branding`
+ * permanece como camada de compatibilidade para instalações que concluíram o
+ * setup visual antes de 0341: ele vence o `.env`, mas nunca uma escolha nova em
+ * `platform_config`. Assim, atualizar não apaga o contato que a pessoa já
+ * informou, e a fonte nova continua sendo a autoridade para mudanças futuras.
  *
  * Virou `async` porque o banco exige espera. O alcance foi medido antes: são
  * duas páginas de servidor, ambas já assíncronas.
  */
 export async function emailDeSuporte(): Promise<string> {
-  const { valor } = await valorDaInstalacao("SUPPORT_EMAIL");
-  return (valor ?? "").trim();
+  const configuracao = await valorDaInstalacao("SUPPORT_EMAIL");
+  if (configuracao.fonte === "banco") return (configuracao.valor ?? "").trim();
+
+  const linha = await marcaDaInstalacao();
+  return linha?.support_email?.trim() || (configuracao.valor ?? "").trim();
 }

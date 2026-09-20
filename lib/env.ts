@@ -28,9 +28,7 @@ const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
  * pra permitir setup parcial (ex: dev sem WAHA quando trabalhando só na UI).
  */
 const required = (name: string) =>
-  isProd
-    ? z.string().min(1, `${name} é obrigatória em produção`)
-    : z.string().default("");
+  isProd ? z.string().min(1, `${name} é obrigatória em produção`) : z.string().default("");
 
 const requiredAlways = (name: string) => z.string().min(1, `${name} é obrigatória`);
 
@@ -80,6 +78,11 @@ const schema = z.object({
    * (404); com menos de 32 caracteres também fica desligada.
    */
   TENANT_PROVISIONING_SECRET: z.string().optional().default(""),
+  /**
+   * Segredo de uso unico que abre o assistente da instalacao. Vazio ou curto
+   * desliga `/setup`; depois da conclusao o estado duravel do banco prevalece.
+   */
+  SETUP_TOKEN: z.string().optional().default(""),
 
   // Laboratório local de extensões: origem HTTP exata em 127.0.0.1. O cliente
   // recusa a exceção se a URL do app não for loopback. Vazio mantém HTTPS público.
@@ -417,14 +420,8 @@ const schema = z.object({
     .transform((v) => v === "true"),
 
   // App URLs
-  NEXT_PUBLIC_APP_URL: z
-    .string()
-    .url()
-    .default("http://localhost:3000"),
-  NEXT_PUBLIC_ADMIN_URL: z
-    .string()
-    .url()
-    .default("http://localhost:3000"),
+  NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+  NEXT_PUBLIC_ADMIN_URL: z.string().url().default("http://localhost:3000"),
 
   // Marca da instalação (white-label) — ver lib/branding.ts.
   // Sem prefixo NEXT_PUBLIC_ de propósito: essas seriam queimadas no bundle
@@ -563,6 +560,9 @@ if (!env.IMPERSONATE_COOKIE_SECRET || env.IMPERSONATE_COOKIE_SECRET.length < 32)
   console.warn(
     "[env] IMPERSONATE_COOKIE_SECRET not set or shorter than 32 chars — impersonate flow will return 503 at runtime.",
   );
+}
+if (env.SETUP_TOKEN && env.SETUP_TOKEN.length < 32) {
+  console.warn("[env] SETUP_TOKEN shorter than 32 chars - initial setup will remain disabled.");
 }
 
 export type Env = typeof env;

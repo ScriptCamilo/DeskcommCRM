@@ -63,10 +63,7 @@ export default async function Page() {
   // A MESMA pilha do `app/layout.tsx` — banco acima, arquivo de instalação
   // embaixo. Montar outra aqui faria a tela relatar uma precedência que o
   // produto não usa, que é a pior mentira possível numa tela de diagnóstico.
-  const marca = resolverMarca(
-    [camadaDaInstalacao(linha), camadaDoAmbiente(env)],
-    REGUA_DO_PRODUTO,
-  );
+  const marca = resolverMarca([camadaDaInstalacao(linha), camadaDoAmbiente(env)], REGUA_DO_PRODUTO);
 
   // O que apareceria SEM o arquivo subido — a MESMA pilha com `logo_path`
   // zerado, e não uma leitura solta de `APP_LOGO_URL`. É assim que a prévia
@@ -93,6 +90,7 @@ export default async function Page() {
       <FormularioDaMarca
         gravada={{
           app_name: linha?.app_name ?? null,
+          support_email: linha?.support_email ?? null,
           logo_url: linha?.logo_url ?? null,
           logo_path: linha?.logo_path ?? null,
           accent_hex: linha?.accent_hex ?? null,

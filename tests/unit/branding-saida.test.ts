@@ -54,6 +54,7 @@ let linhaDaInstalacao: {
   app_name?: string | null;
   logo_url?: string | null;
   accent_hex?: string | null;
+  support_email?: string | null;
 } | null = null;
 
 vi.mock("@/lib/branding/instalacao", () => ({
@@ -248,6 +249,18 @@ describe("emailDeSuporte", () => {
     process.env.SUPPORT_EMAIL = "  ajuda@revenda.com.br  ";
     const { emailDeSuporte } = await carregar();
     expect(await emailDeSuporte()).toBe("ajuda@revenda.com.br");
+    if (original === undefined) delete process.env.SUPPORT_EMAIL;
+    else process.env.SUPPORT_EMAIL = original;
+  });
+
+  it("preserva o endereço do setup visual acima do piso do ambiente", async () => {
+    const original = process.env.SUPPORT_EMAIL;
+    process.env.SUPPORT_EMAIL = "suporte-antigo@revenda.com.br";
+    linhaDaInstalacao = { support_email: "  atendimento@revenda.com.br  " };
+
+    const { emailDeSuporte } = await carregar();
+    expect(await emailDeSuporte()).toBe("atendimento@revenda.com.br");
+
     if (original === undefined) delete process.env.SUPPORT_EMAIL;
     else process.env.SUPPORT_EMAIL = original;
   });
