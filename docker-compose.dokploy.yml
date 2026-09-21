@@ -18,7 +18,6 @@ x-runtime-environment: &runtime-environment
   NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:?configure NEXT_PUBLIC_SUPABASE_ANON_KEY}
   SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:?configure SUPABASE_SERVICE_ROLE_KEY}
   SUPABASE_DB_URL: ${SUPABASE_DB_URL:?configure SUPABASE_DB_URL}
-  SUPABASE_DB_ADMIN_URL: ${SUPABASE_DB_ADMIN_URL:-}
   NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?configure NEXT_PUBLIC_APP_URL}
   NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL:?configure NEXT_PUBLIC_ADMIN_URL}
   INTERNAL_SECRET: ${INTERNAL_SECRET:?configure INTERNAL_SECRET}
@@ -178,6 +177,20 @@ x-runtime-environment: &runtime-environment
   EGRESS_EXTRA_ALLOWED_HOSTS: ${EGRESS_EXTRA_ALLOWED_HOSTS:-}
 
 services:
+  migrator:
+    image: ${DOKPLOY_MIGRATOR_IMAGE:-scriptcamilo/deskcomm-migrator-dokploy:local}
+    build:
+      context: .
+      dockerfile: Dockerfile.migrator
+    restart: "no"
+    mem_limit: 128m
+    environment:
+      # Esta credencial so existe neste processo efemero. O app e o worker
+      # continuam recebendo apenas a URL operacional.
+      SUPABASE_DB_ADMIN_URL: ${SUPABASE_DB_ADMIN_URL:?configure SUPABASE_DB_ADMIN_URL}
+    logging: *default-logging
+    networks: [internal]
+
   app:
     image: ${DOKPLOY_APP_IMAGE:-scriptcamilo/deskcommcrm-dokploy:local}
     build:
@@ -191,6 +204,8 @@ services:
     expose:
       - "3000"
     depends_on:
+      migrator:
+        condition: service_completed_successfully
       srh:
         condition: service_started
       waha:
@@ -223,6 +238,8 @@ services:
       <<: *runtime-environment
       HEALTH_PORT: 8787
     depends_on:
+      migrator:
+        condition: service_completed_successfully
       srh:
         condition: service_started
       waha:
