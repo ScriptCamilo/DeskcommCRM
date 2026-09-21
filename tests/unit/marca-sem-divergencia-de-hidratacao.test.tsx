@@ -236,15 +236,23 @@ describe("catraca: `branding()` é server-only", () => {
     // A guarda contra o erro NOVO que o corte por bloco introduz: se o regex de
     // `/* … */` engolisse código, esta lista esvaziaria e a catraca ficaria verde
     // por cegueira — o mesmo defeito que ela existe para impedir, do lado do
-    // instrumento. Estes quatro são servidores e DEVEM chamar `branding()`.
+    // instrumento. Estes são servidores e DEVEM chamar `branding()`. A tela
+    // pública de login fica fora: ela usa a marca persistida da instalação.
     const esperados = [
-      "app/(public)/login/page.tsx",
       "app/(public)/signup/page.tsx",
       "app/onboarding/layout.tsx",
       "lib/legal/operador.ts",
     ];
     const vistos = varridos.filter(chamaBranding).map((f) => relativoEmBarraNormal(RAIZ, f));
     expect(esperados.filter((e) => !vistos.includes(e))).toEqual([]);
+  });
+
+  it("o login usa a marca resolvida da instalação", () => {
+    const login = fs.readFileSync(path.join(RAIZ, "app/(public)/login/page.tsx"), "utf8");
+    expect(login).toContain('import { marcaDaSaida } from "@/lib/branding/saida";');
+    expect(login).toContain("const marca = await marcaDaSaida(null);");
+    expect(login).toContain("{marca.nome}");
+    expect(semComentarios(login)).not.toMatch(/\bbranding\(\)/);
   });
 
   it("nenhum componente `\"use client\"` chama `branding()`", () => {
