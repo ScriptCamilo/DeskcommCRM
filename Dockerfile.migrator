@@ -1,0 +1,14 @@
+# syntax=docker/dockerfile:1
+# Aplicador efemero do schema para deploys Docker Compose no Dokploy.
+FROM postgres:17-alpine
+
+WORKDIR /app
+LABEL org.opencontainers.image.source="https://github.com/melgarafael/DeskcommCRM" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.title="DeskcommCRM migrator"
+
+COPY --chown=postgres:postgres supabase/baseline.sql ./supabase/baseline.sql
+COPY --chown=postgres:postgres scripts/dokploy-aplicar-schema.sh /usr/local/bin/dokploy-aplicar-schema
+
+USER postgres
+CMD ["/bin/sh", "/usr/local/bin/dokploy-aplicar-schema"]

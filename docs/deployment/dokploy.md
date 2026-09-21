@@ -12,9 +12,11 @@ Dokploy continua dono dessas responsabilidades.
 - acesso ao fork e permissao para o Dokploy construir o repositorio;
 - OpenSSL numa maquina confiavel para gerar os segredos.
 
-O Supabase nao faz parte do compose. Banco e aplicacao possuem ciclos separados:
-aplique migrations pelo fluxo controlado do Supabase antes de publicar uma
-versao que dependa delas. O startup da aplicacao nunca executa DDL.
+O Supabase nao faz parte do compose. Um servico efemero, `migrator`, roda antes
+de `app` e `worker`: ele cria as extensoes exigidas e reaplica o
+`supabase/baseline.sql` idempotente com a credencial administrativa. Se essa
+etapa falhar, a aplicacao nao inicia com codigo novo sobre schema antigo. O
+startup normal da aplicacao nunca executa DDL.
 
 ## Criar o servico
 
@@ -56,7 +58,8 @@ resolucao do compose antes que uma stack parcialmente configurada seja criada.
 | `NEXT_PUBLIC_SUPABASE_URL`      | URL HTTP do projeto Supabase       | painel do Supabase          |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | chave publica do Supabase          | painel do Supabase          |
 | `SUPABASE_SERVICE_ROLE_KEY`     | operacoes server-side              | segredo do Supabase         |
-| `SUPABASE_DB_URL`               | Postgres usado pelo worker         | connection string com SSL   |
+| `SUPABASE_DB_URL`               | Postgres usado pelo worker         | Session pooler com SSL      |
+| `SUPABASE_DB_ADMIN_URL`         | schema no servico `migrator`       | Session pooler administrativa com SSL |
 | `NEXT_PUBLIC_APP_URL`           | URL publica canonica               | `https://crm.exemplo.com`   |
 | `NEXT_PUBLIC_ADMIN_URL`         | URL da administracao               | pode ser a mesma URL do app |
 | `INTERNAL_SECRET`               | chamadas internas autenticadas     | `openssl rand -hex 32`      |
@@ -94,9 +97,10 @@ permite isso.
 continuam como fallback de rollback. O assistente grava nome, logo, cor e email
 de suporte no banco, que passa a ser a fonte de verdade.
 
-`SUPABASE_DB_ADMIN_URL` e opcional no runtime e nao e usada para migrations pelo
-app. Se uma pipeline de banco precisar dela, mantenha a credencial somente nessa
-pipeline, fora dos containers da aplicacao sempre que possivel.
+`SUPABASE_DB_ADMIN_URL` e obrigatoria nesta distribuicao Dokploy, mas chega
+somente ao `migrator`, que encerra depois de aplicar o baseline. Use a URI do
+**Session pooler** (IPv4), nunca a conexao direta `db.<ref>.supabase.co`, que
+depende de IPv6. Ela nao e entregue a `app`, `worker` ou `scheduler`.
 
 ## Primeiro administrador
 
@@ -131,11 +135,17 @@ do Git e as imagens podem ser reconstruidas do commit publicado.
 
 ## Atualizar
 
-1. aplique migrations novas pelo fluxo do Supabase;
-2. selecione a nova tag ou commit no Dokploy;
-3. faca redeploy do compose;
+1. selecione a nova tag ou commit no Dokploy;
+2. faca redeploy do compose;
+3. confira nos logs que `migrator` terminou com `[schema] baseline concluido`;
 4. confira `/api/v1/health`, logs do worker e execucao do scheduler;
 5. nunca execute novamente o bootstrap numa instalacao ja concluida.
+
+O painel do Supabase pode mostrar poucas migrations em **Migration history**:
+o baseline e aplicado diretamente e nao forja linhas nessa tabela. Neste fork,
+o indicador operacional e o log bem-sucedido do `migrator`, nao `supabase db
+push`; a cadeia historica de migrations nao e o caminho suportado para instalar
+um banco do zero.
 
 Evite apontar clientes para uma branch movel sem janela de validacao. Releases
 devem usar tag imutavel e manter app, worker e scheduler no mesmo commit.
