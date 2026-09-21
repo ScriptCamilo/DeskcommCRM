@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { requireAuth, resolveActiveOrg } from "@/lib/auth/server";
 import { createClient } from "@/lib/supabase/server";
-import { branding } from "@/lib/branding";
+import { marcaDaSaida } from "@/lib/branding/saida";
 import { RecoverOrganizationForm } from "@/components/auth/RecoverOrganizationForm";
 import { traduzir } from "@/lib/i18n/dicionario";
 import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
@@ -41,6 +41,7 @@ export default async function GetStartedPage() {
   // Fora da árvore de `app/app/layout.tsx`, como as telas públicas: o idioma
   // vem do próprio usuário, e o formulário precisa do provider para o `useT()`.
   const t = (texto: string) => traduzir(texto, user.idioma);
+  const marca = await marcaDaSaida(null);
 
   return (
     <IdiomaProvider locale={user.idioma}>
@@ -48,7 +49,7 @@ export default async function GetStartedPage() {
         <div className="w-full max-w-md space-y-6 rounded-lg border bg-background p-6 shadow-sm">
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              {branding().name}
+              {marca.nome}
             </p>
             <h1 className="text-2xl font-semibold tracking-tight">
               {t("Configure sua organização")}
