@@ -232,19 +232,22 @@ describe("catraca: `branding()` é server-only", () => {
     expect(semComentarios(`const nome = branding().name; // usa a marca`)).toMatch(/\bbranding\(\)/);
   });
 
-  it("os call sites REAIS de `branding()` continuam visíveis à varredura", () => {
-    // A guarda contra o erro NOVO que o corte por bloco introduz: se o regex de
-    // `/* … */` engolisse código, esta lista esvaziaria e a catraca ficaria verde
-    // por cegueira — o mesmo defeito que ela existe para impedir, do lado do
-    // instrumento. Estes são servidores e DEVEM chamar `branding()`. A tela
-    // pública de login fica fora: ela usa a marca persistida da instalação.
-    const esperados = [
+  it("as fachadas de servidor não pulam a marca persistida", () => {
+    const fachadas = [
+      "app/(public)/login/page.tsx",
       "app/(public)/signup/page.tsx",
+      "app/get-started/page.tsx",
+      "app/legal/layout.tsx",
       "app/onboarding/layout.tsx",
+      "app/onboarding/welcome/page.tsx",
       "lib/legal/operador.ts",
     ];
-    const vistos = varridos.filter(chamaBranding).map((f) => relativoEmBarraNormal(RAIZ, f));
-    expect(esperados.filter((e) => !vistos.includes(e))).toEqual([]);
+
+    for (const relativa of fachadas) {
+      const fonte = fs.readFileSync(path.join(RAIZ, relativa), "utf8");
+      expect(semComentarios(fonte), relativa).not.toMatch(/\bbranding\(\)/);
+      expect(fonte, relativa).toContain('marcaDaSaida(null)');
+    }
   });
 
   it("o login usa a marca resolvida da instalação", () => {

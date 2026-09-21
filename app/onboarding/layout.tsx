@@ -6,7 +6,8 @@ import { Stepper } from "./_components/Stepper";
 import { OutrasOrganizacoes } from "./_components/OutrasOrganizacoes";
 import { SkipToEnd } from "./_components/SkipToEnd";
 import { SimboloDoProduto } from "@/components/branding/MarcaDoProduto";
-import { branding, marcaEhADoProduto } from "@/lib/branding";
+import { marcaEhADoProduto } from "@/lib/branding";
+import { marcaDaSaida } from "@/lib/branding/saida";
 import { passosVisiveis } from "@/lib/onboarding/passos";
 import { env } from "@/lib/env";
 import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
@@ -33,7 +34,7 @@ export default async function OnboardingLayout({ children }: { children: React.R
   }));
 
   const isDev = process.env.NODE_ENV !== "production";
-  const marca = branding();
+  const marca = await marcaDaSaida(null);
 
   return (
     <IdiomaProvider locale={user.idioma}>
@@ -42,11 +43,11 @@ export default async function OnboardingLayout({ children }: { children: React.R
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 py-4">
             <div className="flex items-center gap-3">
               {/* O nome está escrito logo abaixo — o símbolo é reforço, não legenda. */}
-              {marcaEhADoProduto(marca) && (
-                <SimboloDoProduto nome={marca.name} decorativo className="h-9 w-9" />
+              {marcaEhADoProduto({ name: marca.nome, logoUrl: marca.logoUrl }) && (
+                <SimboloDoProduto nome={marca.nome} decorativo className="h-9 w-9" />
               )}
               <div>
-                <p className="text-xs uppercase tracking-wider text-muted-foreground">{marca.name}</p>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">{marca.nome}</p>
                 <h1 className="text-lg font-semibold tracking-tight">{activeOrg.name}</h1>
               </div>
             </div>
