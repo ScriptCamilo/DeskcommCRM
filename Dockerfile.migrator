@@ -3,7 +3,7 @@
 FROM postgres:17-alpine
 
 WORKDIR /app
-LABEL org.opencontainers.image.source="https://github.com/melgarafael/DeskcommCRM" \
+LABEL org.opencontainers.image.source="https://github.com/ScriptCamilo/DeskcommCRM" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.title="DeskcommCRM migrator"
 
