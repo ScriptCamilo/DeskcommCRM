@@ -8,7 +8,7 @@ import { motivoDoErro, sql } from "./psql-transporte";
 const ACTOR = "03430000-0000-4000-8000-000000000001";
 const OUTRO = "03430000-0000-4000-8000-000000000002";
 const MIGRATION = readFileSync(
-  resolve("supabase/migrations/20260919235900_0375_setup_inicial_seguro.sql"),
+  resolve("supabase/migrations/20260923222231_0393_setup_inicial_seguro.sql"),
   "utf8",
 );
 
