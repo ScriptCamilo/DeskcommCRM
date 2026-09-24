@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SuspendDialog } from "./SuspendDialog";
 import { ReactivateDialog } from "./ReactivateDialog";
 import { ImpersonateButton } from "@/components/admin/ImpersonateButton";
+import { OwnerInviteRecovery } from "./OwnerInviteRecovery";
 import { useT } from "@/hooks/i18n/useT";
 
 // ---------------------------------------------------------------------------
@@ -49,6 +50,8 @@ export function TenantActions({
             isRedacted ? t("Tenant redigido — ação não disponível") : undefined
           }
         />
+
+        <OwnerInviteRecovery organizationId={organizationId} disabled={!canSuspend} />
 
         {/* Suspend */}
         {canSuspend && (
