@@ -35,6 +35,7 @@ function linha(patch: Partial<LinhaDaMarca> = {}): LinhaDaMarca {
     app_name: null,
     logo_url: null,
     accent_hex: null,
+    support_email: null,
     show_powered_by: true,
     seeded_from_env: true,
     fallback_at: null,

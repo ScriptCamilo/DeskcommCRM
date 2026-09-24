@@ -179,6 +179,7 @@ fonte só (`lib/onboarding/passos.ts`) — eram três listas que discordavam. Ga
 | J5.12 | Admin **revoga** um convite pendente | `POST /api/v1/team/invites/[id]/revoke` marca `revoked_at`; o aceite passa a recusar o token mesmo dentro da validade; audita `member.invite_revoked` |
 | J5.13 | Admin **reenvia** um convite | `POST /api/v1/team/invites/[id]/resend` re-assina o mesmo `invite_id`, renova 24h, audita `member.invited`; reconvidar o mesmo e-mail pendente pela tela de convite RENOVA a linha (índice único parcial) |
 | J5.14 | Manager vê a lista, mas não as ações | leitura é `team_invites_select` (manager+); reenviar/revogar são admin-only (403) |
+| J5.15 `[P0]` | Admin da plataforma perdeu o link inicial do responsável | em **Admin → tenant → Ações**, “Reenviar convite do responsável” encontra o convite pelo mesmo `request_id` da criação, emite uma linha canônica em `team_invites` e sempre devolve link copiável; se o e-mail não sair, a tela diz isso sem esconder o link · `app/api/v1/admin/tenants/[id]/owner-invite/route.test.ts` + `components/admin/tenants/OwnerInviteRecovery.test.tsx` |
 
 ## J6 — Webhooks: receber, automatizar, provar `[P0]`
 

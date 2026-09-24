@@ -111,6 +111,14 @@
       "sublabel": "status, e-mail despachado, link copiável; reenviar/revogar (admin)"
     },
     {
+      "id": "recuperar-convite-dono",
+      "lane": "humano",
+      "col": 4,
+      "type": "ui",
+      "label": "Admin → tenant → Reenviar convite do responsável",
+      "sublabel": "correlaciona criação + convite por request_id; sempre mostra o novo link"
+    },
+    {
       "id": "context",
       "lane": "app",
       "col": 6,
@@ -184,6 +192,16 @@
       "from": "tela-convites",
       "to": "convite",
       "label": "reenviar"
+    },
+    {
+      "from": "audit",
+      "to": "recuperar-convite-dono",
+      "label": "localiza o responsável original"
+    },
+    {
+      "from": "recuperar-convite-dono",
+      "to": "convite",
+      "label": "reemite"
     },
     {
       "from": "tela-convites",
