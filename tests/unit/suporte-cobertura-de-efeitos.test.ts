@@ -45,6 +45,10 @@ it("todo handler mutante do app declara guarda de suporte ou é infraestrutura i
  const uncovered:string[]=[];
  for(const path of files("app/api/v1").filter(p=>p.endsWith("/route.ts"))){
   if(/app\/api\/v1\/(cron|webhooks)\//.test(path)||path==="app/api/v1/system/agent/route.ts")continue; // segredo de máquina, sem actor/session cookie
+  // Primeiro acesso da instalação: autentica pelo SETUP_TOKEN e pelo cookie
+  // HMAC curto, antes de existir usuário ou sessão que a guarda de suporte
+  // pudesse consultar. Depois de concluído, o estado durável fecha as rotas.
+  if(path==="app/api/v1/setup/session/route.ts"||path==="app/api/v1/setup/complete/route.ts")continue;
   // Provisionamento por sistema externo: Bearer do segredo da INSTALAÇÃO
   // (TENANT_PROVISIONING_SECRET), sem cookie nem ator — a mesma natureza das
   // linhas acima. Não há sessão de suporte para a guarda ler; chamá-la aqui

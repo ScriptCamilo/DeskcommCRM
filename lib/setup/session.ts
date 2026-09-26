@@ -2,10 +2,10 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 import { env } from "@/lib/env";
 
-export const SETUP_COOKIE_NAME = "deskcomm-setup";
+export const SETUP_COOKIE_NAME = "crm-setup";
 export const SETUP_SESSION_TTL_SECONDS = 20 * 60;
 
-type SetupSessionPayload = { purpose: "initial_setup"; exp: number };
+type SetupSessionPayload = { scope: "initial_setup"; exp: number };
 export type SetupSessionResult =
   | { valid: true; payload: SetupSessionPayload }
   | { valid: false; reason: "missing_secret" | "malformed" | "invalid_signature" | "expired" };
@@ -38,7 +38,7 @@ export function assinarSessaoDoSetup(
 ): string {
   if (!setupEstaConfigurado(secret)) throw new Error("SETUP_TOKEN ausente ou curto");
   const payload = codificar(
-    JSON.stringify({ purpose: "initial_setup", exp: agoraEmSegundos + SETUP_SESSION_TTL_SECONDS }),
+    JSON.stringify({ scope: "initial_setup", exp: agoraEmSegundos + SETUP_SESSION_TTL_SECONDS }),
   );
   return `${payload}.${codificar(assinatura(payload, secret))}`;
 }
@@ -67,7 +67,7 @@ export function verificarSessaoDoSetup(
     const parsed = JSON.parse(
       Buffer.from(payload, "base64url").toString("utf8"),
     ) as Partial<SetupSessionPayload>;
-    if (parsed.purpose !== "initial_setup" || typeof parsed.exp !== "number") {
+    if (parsed.scope !== "initial_setup" || typeof parsed.exp !== "number") {
       return { valid: false, reason: "malformed" };
     }
     if (parsed.exp <= agoraEmSegundos) return { valid: false, reason: "expired" };
