@@ -39022,43 +39022,8 @@ grant execute on function public.fn_enfileirar_midia_vencida(integer) to service
 notify pgrst, 'reload schema';
 
 -- ---- setup inicial seguro (migration 0393) ----
--- O baseline tambem precisa expor a operacao usada pelo assistente de primeira
--- configuracao. A migration versionada atende instalacoes existentes; este
--- apendice idempotente atende install e update pelo kit self-host.
-alter table public.platform_settings
-  add column if not exists setup_completed_at timestamptz,
-  add column if not exists setup_completed_by uuid;
-
-comment on column public.platform_settings.setup_completed_at is
-  'Instante em que o setup inicial da instalacao foi concluido.';
-comment on column public.platform_settings.setup_completed_by is
-  'Usuario criado ou promovido pelo setup inicial. Sem FK para preservar a proveniencia.';
-
-alter table public.platform_branding
-  add column if not exists support_email public.citext;
-
-comment on column public.platform_branding.support_email is
-  'Email publico de suporte da marca da instalacao.';
-
-insert into public.platform_settings (id)
-select 1
-where exists (
-  select 1 from public.platform_admins where revoked_at is null
-)
-on conflict (id) do nothing;
-
-update public.platform_settings ps
-   set setup_completed_at = coalesce(ps.setup_completed_at, pa.granted_at),
-       setup_completed_by = coalesce(ps.setup_completed_by, pa.user_id)
-  from lateral (
-    select user_id, granted_at
-      from public.platform_admins
-     where revoked_at is null
-     order by granted_at asc, user_id asc
-     limit 1
-  ) pa
- where ps.id = 1
-   and ps.setup_completed_at is null;
+-- A funcao precisa nascer antes da varredura de anon. As colunas e o backfill
+-- que ela usa entram depois, quando a upstream cria `platform_settings`.
 
 create or replace function public.fn_complete_initial_setup(
   p_actor uuid,
@@ -39305,6 +39270,46 @@ drop trigger if exists trg_platform_settings_touch on public.platform_settings;
 create trigger trg_platform_settings_touch
   before update on public.platform_settings
   for each row execute function public.fn_touch_updated_at();
+
+notify pgrst, 'reload schema';
+
+-- ---- estado do setup inicial seguro (migration 0393) ----
+-- Esta metade vem depois da criacao de `platform_settings`; a funcao que usa as
+-- colunas ja nasceu antes da varredura de anon e so sera compilada ao ser chamada.
+alter table public.platform_settings
+  add column if not exists setup_completed_at timestamptz,
+  add column if not exists setup_completed_by uuid;
+
+comment on column public.platform_settings.setup_completed_at is
+  'Instante em que o setup inicial da instalacao foi concluido.';
+comment on column public.platform_settings.setup_completed_by is
+  'Usuario criado ou promovido pelo setup inicial. Sem FK para preservar a proveniencia.';
+
+alter table public.platform_branding
+  add column if not exists support_email public.citext;
+
+comment on column public.platform_branding.support_email is
+  'Email publico de suporte da marca da instalacao.';
+
+insert into public.platform_settings (id)
+select 1
+where exists (
+  select 1 from public.platform_admins where revoked_at is null
+)
+on conflict (id) do nothing;
+
+update public.platform_settings ps
+   set setup_completed_at = coalesce(ps.setup_completed_at, pa.granted_at),
+       setup_completed_by = coalesce(ps.setup_completed_by, pa.user_id)
+  from lateral (
+    select user_id, granted_at
+      from public.platform_admins
+     where revoked_at is null
+     order by granted_at asc, user_id asc
+     limit 1
+  ) pa
+ where ps.id = 1
+   and ps.setup_completed_at is null;
 
 notify pgrst, 'reload schema';
 
