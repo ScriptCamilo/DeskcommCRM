@@ -7641,6 +7641,7 @@ export type Database = {
           logo_url: string | null
           seeded_from_env: boolean
           show_powered_by: boolean
+          support_email: string | null
           updated_at: string
           updated_by: string | null
         }
@@ -7654,6 +7655,7 @@ export type Database = {
           logo_url?: string | null
           seeded_from_env?: boolean
           show_powered_by?: boolean
+          support_email?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -7667,6 +7669,7 @@ export type Database = {
           logo_url?: string | null
           seeded_from_env?: boolean
           show_powered_by?: boolean
+          support_email?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -10365,4 +10368,3 @@ export const Constants = {
     },
   },
 } as const
-

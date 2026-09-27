@@ -10528,6 +10528,13 @@ export const DICIONARIO: Traducoes = {
   "Você já é administrador de": { es: "Ya eres administrador de" },
   "Convite enviado por e-mail.": { es: "Invitación enviada por correo electrónico." },
   "O envio por e-mail não foi confirmado. Copie o link e compartilhe com o responsável.": { es: "No se confirmó el envío por correo electrónico. Copia el enlace y compártelo con el responsable." },
+  "Não foi possível copiar. Selecione o link abaixo.": {
+    es: "No se pudo copiar. Selecciona el enlace de abajo.",
+  },
+  "Reenviando…": { es: "Reenviando…" },
+  "Reenviar convite do responsável": { es: "Reenviar invitación del responsable" },
+  "Envio não confirmado para": { es: "Envío no confirmado para" },
+  "Link do convite do responsável": { es: "Enlace de la invitación del responsable" },
   "Link do convite": { es: "Enlace de la invitación" },
   "Válido até": { es: "Válido hasta" },
   "Link copiado": { es: "Enlace copiado" },
@@ -10703,6 +10710,10 @@ export const DICIONARIO: Traducoes = {
   },
   "Convite reenviado.": { es: "Invitación reenviada." },
   "Convite revogado.": { es: "Invitación revocada." },
+  "Email de suporte": { es: "Correo electrónico de soporte" },
+  "Aparece para clientes em telas de conta e cobranca. Deixe em branco para usar o valor do arquivo de instalacao.": {
+    es: "Aparece para los clientes en las pantallas de cuenta y facturación. Déjalo en blanco para usar el valor del archivo de instalación.",
+  },
 
   // ─── issue #651 — tabelas de rótulo que só o guarda ampliado alcança ───
   //

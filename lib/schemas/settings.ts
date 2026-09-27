@@ -274,6 +274,7 @@ export type PipelineConfigPatch = z.infer<typeof pipelineConfigPatchSchema>;
  */
 export const platformBrandingSchema = z.object({
   app_name: z.string().trim().min(1).max(120).nullable(),
+  support_email: z.string().trim().email().max(200).nullable(),
   logo_url: z.string().trim().url().max(2048).nullable(),
   accent_hex: z
     .string()
