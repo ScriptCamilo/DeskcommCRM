@@ -14,8 +14,8 @@
  */
 import { env } from "@/lib/env";
 import { valorDaInstalacao } from "@/lib/instalacao/config";
-import { marcaDaSaida } from "@/lib/branding/saida";
-import { loadAuthUser, resolveActiveOrg } from "@/lib/auth/server";
+import { branding } from "@/lib/branding";
+import { loadAuthUser, orgAtivaSemPortao } from "@/lib/auth/server";
 import { createClient } from "@/lib/supabase/server";
 
 export interface Operador {
@@ -70,18 +70,15 @@ export function urlDePoliticaSegura(valor: unknown): string | null {
  * `resolverOperador`, que já era assíncrona — o alcance foi medido antes de
  * mudar a assinatura.
  */
-const SEM_SESSAO = async (): Promise<Operador> => {
-  const marca = await marcaDaSaida(null);
-  return {
-    sistema: marca.nome,
-    nome: null,
-    razaoSocial: null,
-    cnpj: null,
-    dpoEmail: (await valorDaInstalacao("LGPD_DPO_EMAIL")).valor?.trim() || null,
-    politicaPropria: null,
-    resolvido: false,
-  };
-};
+const SEM_SESSAO = async (): Promise<Operador> => ({
+  sistema: branding().name,
+  nome: null,
+  razaoSocial: null,
+  cnpj: null,
+  dpoEmail: (await valorDaInstalacao("LGPD_DPO_EMAIL")).valor?.trim() || null,
+  politicaPropria: null,
+  resolvido: false,
+});
 
 /**
  * Lê os dados do operador com o client de SESSÃO, nunca com o service role: a
@@ -98,7 +95,7 @@ export async function resolverOperador(): Promise<Operador> {
   const user = await loadAuthUser();
   if (!user) return await SEM_SESSAO();
 
-  const activeOrg = await resolveActiveOrg(user);
+  const activeOrg = await orgAtivaSemPortao(user);
   if (!activeOrg) return await SEM_SESSAO();
 
   const supabase = await createClient();
@@ -110,7 +107,7 @@ export async function resolverOperador(): Promise<Operador> {
 
   // Falha de leitura não pode apagar o documento da tela: o texto do produto
   // vale para todo mundo, e o que se perde é só a personalização.
-  if (error || !data) return await SEM_SESSAO();
+  if (error || !data) return { ...(await SEM_SESSAO()), sistema: branding().name };
 
   const org = data as {
     display_name: string | null;
@@ -121,7 +118,7 @@ export async function resolverOperador(): Promise<Operador> {
   };
 
   return {
-    sistema: (await marcaDaSaida(null)).nome,
+    sistema: branding().name,
     nome: org.display_name?.trim() || null,
     razaoSocial: org.legal_name?.trim() || null,
     cnpj: org.cnpj?.trim() || null,
