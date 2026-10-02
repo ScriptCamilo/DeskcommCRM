@@ -43,7 +43,6 @@ export default async function GetStartedPage() {
   // Fora da árvore de `app/app/layout.tsx`, como as telas públicas: o idioma
   // vem do próprio usuário, e o formulário precisa do provider para o `useT()`.
   const t = (texto: string) => traduzir(texto, user.idioma);
-  const marca = await marcaDaSaida(null);
 
   // COM APROVAÇÃO (migration 0383): a mesma tela vira o pedido. A tabela só é
   // lida nesse modo — com a chave desligada, esta tela faz exatamente o que

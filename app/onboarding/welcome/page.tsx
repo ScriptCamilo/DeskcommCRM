@@ -14,8 +14,6 @@ export default async function WelcomePage() {
   const activeOrg = await resolveActiveOrg(user);
   if (!activeOrg) redirect("/login");
   const idioma = user.idioma;
-  const marca = await marcaDaSaida(null);
-
   // O nome em texto vem do resolvedor do BANCO (`marcaDaSaida`), não do
   // `branding()` — que lê só o `.env`. O banco vence; o `.env` é o piso.
   const marca = await marcaDaSaida(null);
