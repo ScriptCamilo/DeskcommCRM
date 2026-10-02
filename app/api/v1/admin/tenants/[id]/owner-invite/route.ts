@@ -13,8 +13,10 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { fail, ok } from "@/lib/api/wrappers";
-import { mfaEmDivida } from "@/lib/auth/server";
-import { requirePlatformAdmin } from "@/lib/auth/requirePlatformAdmin";
+import {
+  falhaDaEscritaDePlatformAdmin,
+  requirePlatformAdminEscrita,
+} from "@/lib/auth/requirePlatformAdmin";
 import { requireSupportWrite } from "@/lib/impersonate/support";
 import { INTERFACE_COMPLETA } from "@/lib/navigation/interface";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -40,19 +42,15 @@ export async function POST(
   const supportDenied = await requireSupportWrite(tenantId);
   if (supportDenied) return supportDenied;
 
-  let adminCtx: Awaited<ReturnType<typeof requirePlatformAdmin>>;
+  let adminCtx: Awaited<ReturnType<typeof requirePlatformAdminEscrita>>;
   try {
-    adminCtx = await requirePlatformAdmin();
-  } catch {
-    return fail("forbidden", "Administrador da plataforma obrigatório.", 403, { requestId });
-  }
-  if (adminCtx.platformAdmin.scope !== "full") {
-    return fail("forbidden", "Seu acesso de suporte não permite reenviar convites.", 403, {
+    adminCtx = await requirePlatformAdminEscrita();
+  } catch (err) {
+    return falhaDaEscritaDePlatformAdmin(
+      err,
       requestId,
-    });
-  }
-  if (await mfaEmDivida()) {
-    return fail("mfa_required", "Confirme a verificação em duas etapas.", 403, { requestId });
+      "Administrador da plataforma obrigatório.",
+    );
   }
 
   const admin = createAdminClient();
