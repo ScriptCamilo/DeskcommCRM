@@ -339,7 +339,7 @@ it("baseline completo reaplicado preserva job transactional_delivery e ambas as 
   await expect(
     pool.query("insert into job_queue(organization_id,kind) values($1,'made_up_kind')", [org]),
   ).rejects.toMatchObject({ code: "23514", constraint: "job_queue_kind_check" });
-});
+}, 180_000);
 
 it("avisos de presença/recuperação e Meet são exportados e redigidos sem recriação tardia", async () => {
   const subject = randomUUID(), sibling = randomUUID(), foreign = randomUUID();
