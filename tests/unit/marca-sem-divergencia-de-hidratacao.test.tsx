@@ -240,10 +240,9 @@ describe("catraca: `branding()` é server-only", () => {
     // A guarda contra o erro NOVO que o corte por bloco introduz: se o regex de
     // `/* … */` engolisse código, esta lista esvaziaria e a catraca ficaria verde
     // por cegueira — o mesmo defeito que ela existe para impedir, do lado do
-    // instrumento. Estes quatro são servidores e DEVEM chamar `branding()`.
+    // instrumento. Este e servidor e DEVE chamar `branding()`. As fachadas
+    // publicas usam `marcaDaSaida()`, que consulta a marca persistida.
     const esperados = [
-      "app/(public)/login/page.tsx",
-      "app/(public)/signup/page.tsx",
       "lib/legal/operador.ts",
     ];
     const vistos = varridos.filter(chamaBranding).map((f) => relativoEmBarraNormal(RAIZ, f));

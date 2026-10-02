@@ -34,7 +34,17 @@ case "${GITHUB_EVENT_NAME:-}" in
     ;;
   pull_request)
     [ -r "${GITHUB_EVENT_PATH:-}" ] || recusa "payload do evento ilegível"
-    origem=$(jq -r '.pull_request.head.repo.full_name // ""' "$GITHUB_EVENT_PATH" 2>/dev/null) \
+    # Roda ANTES do job, então não pode depender das ferramentas que o checkout
+    # instalaria. A imagem traz Python 3 desde o Ubuntu base; ele lê JSON sem
+    # a fragilidade de extrair campo de segurança com grep/sed.
+    origem=$(python3 -c '
+import json, sys
+try:
+    payload = json.load(open(sys.argv[1], encoding="utf-8"))
+    print(payload.get("pull_request", {}).get("head", {}).get("repo", {}).get("full_name") or "")
+except (OSError, ValueError, AttributeError, TypeError):
+    raise SystemExit(1)
+' "$GITHUB_EVENT_PATH" 2>/dev/null) \
       || recusa "payload do evento não é JSON"
     [ "$origem" = "$REPO_ESPERADO" ] || recusa "a branch do PR mora em '${origem:-<desconhecido>}'"
     echo "executor próprio: PR de branch deste repositório aceito"
