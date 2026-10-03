@@ -1,4 +1,4 @@
-import { LOGOTIPO, SIMBOLO } from "@/lib/branding/desenho";
+import { CORES_DA_MARCA, LOGOTIPO_CHANTI, SIMBOLO_CHANTI } from "@/lib/branding/desenho";
 import { cn } from "@/lib/utils";
 
 /**
@@ -26,9 +26,9 @@ type Props = {
   readonly decorativo?: boolean;
 };
 
-const SIMBOLO_CLARO_ESCURO = "fill-[#506d48] dark:fill-[#82a077]";
-const NOME_CLARO_ESCURO = "fill-[#1c1a16] dark:fill-[#f5f4ef]";
-const SUFIXO_CLARO_ESCURO = "fill-[#5d594f] dark:fill-[#8e8b7f]";
+const SIMBOLO_CLARO_ESCURO = "fill-[#8b3dff] dark:fill-[#37d6d0]";
+const NOME_CLARO_ESCURO = "fill-[#151827] dark:fill-[#ffffff]";
+const SUFIXO_CLARO_ESCURO = "fill-[#697386] dark:fill-[#b8c1d1]";
 
 // As classes acima repetem os hexes de `CORES_DA_MARCA` porque o Tailwind só
 // gera utilitário para valor LITERAL no fonte. Quem impede os dois de divergirem
@@ -46,18 +46,48 @@ function acessibilidade(nome: string, decorativo: boolean) {
     : ({ role: "img", "aria-label": nome } as const);
 }
 
+function ConteudoDoSimbolo() {
+  return (
+    <>
+      <defs>
+        <linearGradient
+          id="chanti-ribbon"
+          x1="38"
+          y1="42"
+          x2="178"
+          y2="172"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor={SIMBOLO_CHANTI.gradiente.inicio} />
+          <stop offset="0.54" stopColor={SIMBOLO_CHANTI.gradiente.meio} />
+          <stop offset="1" stopColor={SIMBOLO_CHANTI.gradiente.fim} />
+        </linearGradient>
+      </defs>
+      <path
+        d={SIMBOLO_CHANTI.fita}
+        fill="none"
+        stroke="url(#chanti-ribbon)"
+        strokeLinecap="round"
+        strokeWidth="30"
+      />
+      <g className={SIMBOLO_CLARO_ESCURO}>
+        {SIMBOLO_CHANTI.pontos.map((ponto) => (
+          <circle key={`${ponto.cx}-${ponto.cy}`} {...ponto} />
+        ))}
+      </g>
+    </>
+  );
+}
+
 /** O símbolo sozinho — para a barra recolhida, avatar e cantos apertados. */
 export function SimboloDoProduto({ nome, className, decorativo = false }: Props) {
   return (
     <svg
-      viewBox={SIMBOLO.viewBox}
+      viewBox={SIMBOLO_CHANTI.viewBox}
       className={cn("shrink-0", className)}
       {...acessibilidade(nome, decorativo)}
     >
-      <g className={SIMBOLO_CLARO_ESCURO} transform={SIMBOLO.transform}>
-        <path d={SIMBOLO.d} />
-        <rect {...SIMBOLO.modulo} />
-      </g>
+      <ConteudoDoSimbolo />
     </svg>
   );
 }
@@ -66,24 +96,33 @@ export function SimboloDoProduto({ nome, className, decorativo = false }: Props)
 export function LogotipoDoProduto({ nome, className, decorativo = false }: Props) {
   return (
     <svg
-      viewBox={LOGOTIPO.viewBox}
+      viewBox={LOGOTIPO_CHANTI.viewBox}
       className={cn("shrink-0", className)}
       {...acessibilidade(nome, decorativo)}
     >
-      <g className={SIMBOLO_CLARO_ESCURO} transform={LOGOTIPO.simbolo.transform}>
-        <path d={LOGOTIPO.simbolo.d} />
-        <rect {...LOGOTIPO.simbolo.modulo} />
+      <g transform={LOGOTIPO_CHANTI.simbolo}>
+        <ConteudoDoSimbolo />
       </g>
-      <g className={NOME_CLARO_ESCURO}>
-        {LOGOTIPO.nome.map((g) => (
-          <path key={g.transform} transform={g.transform} d={g.d} />
-        ))}
-      </g>
-      <g className={SUFIXO_CLARO_ESCURO}>
-        {LOGOTIPO.sufixo.map((g) => (
-          <path key={g.transform} transform={g.transform} d={g.d} />
-        ))}
-      </g>
+      <text
+        x={LOGOTIPO_CHANTI.nome.x}
+        y={LOGOTIPO_CHANTI.nome.y}
+        className={NOME_CLARO_ESCURO}
+        fontFamily="var(--font-atkinson), Arial, sans-serif"
+        fontSize="78"
+        fontWeight="700"
+      >
+        {LOGOTIPO_CHANTI.nome.texto}
+      </text>
+      <text
+        x={LOGOTIPO_CHANTI.sufixo.x}
+        y={LOGOTIPO_CHANTI.sufixo.y}
+        className={SUFIXO_CLARO_ESCURO}
+        fontFamily="var(--font-atkinson), Arial, sans-serif"
+        fontSize="42"
+        fontWeight="700"
+      >
+        {LOGOTIPO_CHANTI.sufixo.texto}
+      </text>
     </svg>
   );
 }

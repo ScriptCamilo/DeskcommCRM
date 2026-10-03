@@ -16,7 +16,13 @@
  * runtime em vez de lida do bundle.
  */
 
-export const DEFAULT_APP_NAME = "DeskcommCRM";
+/**
+ * Identidade-base distribuída por este fork.
+ *
+ * A instalação ainda pode substituir nome, logo, ícone e cor pela tela de
+ * Marca; esta constante só é o fallback para a primeira inicialização.
+ */
+export const DEFAULT_APP_NAME = "ChantiCRM";
 
 export type Branding = {
   /** Nome exibido na interface e nos títulos de página. */

@@ -12,9 +12,11 @@ describe("manifest do ícone configurável", () => {
     const valor = await manifest();
     expect(dynamic).toBe("force-dynamic");
     expect(valor.icons).toEqual([
-      { src: "/app-icon/192", sizes: "192x192", type: "image/png" },
-      { src: "/app-icon/512", sizes: "512x512", type: "image/png" },
+      { src: "/app-icon/192", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+      { src: "/app-icon/512", sizes: "512x512", type: "image/png", purpose: "any maskable" },
     ]);
+    expect(valor.background_color).toBe("#0B1020");
+    expect(valor.theme_color).toBe("#0B1020");
   });
   it("trocar ou remover o arquivo muda as URLs sem trocar identidade/start_url", async () => {
     mocks.linha.mockResolvedValueOnce({ favicon_path: "platform/primeiro.png" });

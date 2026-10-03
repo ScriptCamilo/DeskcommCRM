@@ -17,9 +17,21 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     display: "standalone",
     start_url: "/app",
     scope: "/",
+    background_color: "#0B1020",
+    theme_color: "#0B1020",
     icons: [
-      { src: `/app-icon/192${versao}`, sizes: "192x192", type: "image/png" },
-      { src: `/app-icon/512${versao}`, sizes: "512x512", type: "image/png" },
+      {
+        src: `/app-icon/192${versao}`,
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any maskable",
+      },
+      {
+        src: `/app-icon/512${versao}`,
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any maskable",
+      },
     ],
   };
 }

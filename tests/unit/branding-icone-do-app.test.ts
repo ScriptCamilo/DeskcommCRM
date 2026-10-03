@@ -1,9 +1,11 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+const mocks = vi.hoisted(() => ({ marcaEhADoProduto: vi.fn() }));
+
 vi.mock("@/lib/env", () => ({ env: { NEXT_PUBLIC_SUPABASE_URL: "https://storage.example" } }));
 vi.mock("@/lib/logger", () => ({ logger: { warn: vi.fn() } }));
-vi.mock("@/lib/branding", () => ({ marcaEhADoProduto: () => false }));
+vi.mock("@/lib/branding", () => ({ marcaEhADoProduto: mocks.marcaEhADoProduto }));
 vi.mock("@/lib/branding/saida", () => ({ NEUTROS_DE_SAIDA: { fundo: "#ffffff" } }));
 
 import { gerarIconeDoApp, lerArquivoDoIcone } from "@/lib/branding/icone-do-app";
@@ -26,6 +28,7 @@ const marca = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.marcaEhADoProduto.mockReturnValue(false);
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://storage.example");
 });
 afterEach(() => {
@@ -81,6 +84,14 @@ describe("arquivo do ícone público da instalação", () => {
 });
 
 describe("PNG real do aplicativo", () => {
+  it.each([192, 512] as const)("renderiza o símbolo-base em %i×%i", async (lado) => {
+    mocks.marcaEhADoProduto.mockReturnValue(true);
+    const corpo = Buffer.from(await gerarIconeDoApp(lado, marca, null));
+    expect(corpo.subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+    expect(corpo.readUInt32BE(16)).toBe(lado);
+    expect(corpo.readUInt32BE(20)).toBe(lado);
+  });
+
   it.each([192, 512] as const)("renderiza imagem própria em %i×%i", async (lado) => {
     const corpo = Buffer.from(
       await gerarIconeDoApp(lado, marca, `data:image/png;base64,${png.toString("base64")}`),

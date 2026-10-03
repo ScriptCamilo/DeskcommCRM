@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 import { marcaEhADoProduto } from "@/lib/branding";
 import { logger } from "@/lib/logger";
 
-import { CORES_DA_MARCA, SIMBOLO } from "./desenho";
+import { SIMBOLO_CHANTI } from "./desenho";
 import { letraDoIcone } from "./icone";
 import {
   baseDoStorage,
@@ -77,13 +77,35 @@ export async function gerarIconeDoApp(
           <img src={imagem} alt="" width={lado} height={lado} style={{ objectFit: "contain" }} />
         ) : produto ? (
           <svg
-            viewBox={SIMBOLO.viewBox}
+            viewBox={SIMBOLO_CHANTI.viewBox}
             width={Math.round(lado * 0.78)}
             height={Math.round(lado * 0.78)}
           >
-            <g fill={CORES_DA_MARCA.claro.simbolo} transform={SIMBOLO.transform}>
-              <path d={SIMBOLO.d} />
-              <rect {...SIMBOLO.modulo} />
+            <defs>
+              <linearGradient
+                id="chanti-ribbon-pwa"
+                x1="38"
+                y1="42"
+                x2="178"
+                y2="172"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor={SIMBOLO_CHANTI.gradiente.inicio} />
+                <stop offset="0.54" stopColor={SIMBOLO_CHANTI.gradiente.meio} />
+                <stop offset="1" stopColor={SIMBOLO_CHANTI.gradiente.fim} />
+              </linearGradient>
+            </defs>
+            <path
+              d={SIMBOLO_CHANTI.fita}
+              fill="none"
+              stroke="url(#chanti-ribbon-pwa)"
+              strokeLinecap="round"
+              strokeWidth="30"
+            />
+            <g fill={SIMBOLO_CHANTI.gradiente.inicio}>
+              {SIMBOLO_CHANTI.pontos.map((ponto) => (
+                <circle key={`${ponto.cx}-${ponto.cy}`} {...ponto} />
+              ))}
             </g>
           </svg>
         ) : (
