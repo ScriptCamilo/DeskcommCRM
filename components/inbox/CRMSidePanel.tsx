@@ -1,6 +1,7 @@
 "use client";
 
 import { RoteirosDoContato } from "@/components/contacts/RoteirosDoContato";
+import { AcervoSearch } from "./AcervoSearch";
 import { LeadEnrichment } from "./LeadEnrichment";
 import type { ProspectEnrichment } from "@/lib/prospecting/schema";
 import { useAuth } from "@/hooks/auth/AuthProvider";
@@ -31,6 +32,7 @@ import { useEditLead } from "@/hooks/kanban/useUpdateLead";
 import { useBulkAction } from "@/hooks/kanban/useBulkAction";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { PROXIMO_PASSO_DA_MENSAGEM_NOVA } from "@/lib/atendimento/proximo-passo-padrao";
 import { rotuloDoContato } from "@/lib/contacts/rotulo-do-contato";
 import { phoneForDisplay } from "@/lib/channels/phone-variants";
 
@@ -778,7 +780,9 @@ export function CRMSidePanel({ conversation }: Props) {
                   {/* O invariante 4 na frase, não só na cor: quem enxerga mal
                       cor precisa ler a mesma informação. */}
                   <div className={cn("mt-0.5", semPasso ? "font-medium" : "text-muted-foreground")}>
-                    {d.proximo_passo ?? t("Sem próximo passo definido")}
+                    {d.proximo_passo === PROXIMO_PASSO_DA_MENSAGEM_NOVA
+                      ? t("Responder à nova mensagem do cliente")
+                      : (d.proximo_passo ?? t("Sem próximo passo definido"))}
                   </div>
                   {/* A SAÍDA. Sem ela esta seção só denunciava: o atendente via o
                       vazamento e tinha de sair da tela para resolver — peça que
@@ -811,7 +815,7 @@ export function CRMSidePanel({ conversation }: Props) {
       <section data-testid="inbox-memoria">
         <h3 className="text-xs font-semibold">{t("Memória do contato")}</h3>
         <p className="mt-1 text-xs text-muted-foreground">{t("Fatos duráveis registrados nas notas. Pendências pertencem à demanda vigente.")}</p>
-        {!sectionsLoading && fatos.map((f) => <details key={f.id} className="mt-2 text-xs"><summary>{f.headline}</summary><p className="mt-1 whitespace-pre-wrap">{f.body}</p></details>)}
+        {!sectionsLoading && fatos.map((f) => <details key={f.id} className="mt-2 text-xs"><summary className="wrap-anywhere">{f.headline}</summary><p className="mt-1 whitespace-pre-wrap wrap-anywhere">{f.body}</p></details>)}
         {!sectionsLoading && fatos.length === 0 && <p className="mt-2 text-xs text-muted-foreground">{t("Nenhum fato durável registrado.")}</p>}
         {!sectionsLoading && historico.length > 0 && <div className="mt-3 text-xs"><h4>{t("Histórico encerrado — sem tarefas pendentes")}</h4>{historico.map((h) => <p key={h.id}>{t(DESFECHO_LEGIVEL[h.desfecho] ?? h.desfecho)}{h.fechada_em ? ` · ${shortDate(h.fechada_em, localeDaData)}` : ""}</p>)}</div>}
       </section>
@@ -910,6 +914,21 @@ export function CRMSidePanel({ conversation }: Props) {
         ) : (
           <SemLista vazio="Sem atividade." erro={erro} onTentarDeNovo={() => setTentativa((n) => n + 1)} />
         )}
+      </section>
+
+      <Separator />
+
+      {/* Perguntar ao acervo — a MESMA busca que a IA faz, com a origem de cada
+          trecho. Não é busca própria: o componente só pergunta e mostra, e quem
+          decide limiar/top-K é a rota, que chama `buscarConhecimento`. Colocada
+          DEPOIS das seções de trabalho: é consulta, não é o que o atendente abre
+          a conversa para fazer. */}
+      <section>
+        <h3 className="text-xs font-semibold">{t("Acervo")}</h3>
+        <p className="mt-1 mb-2 text-xs text-muted-foreground">
+          {t("Pergunte como a IA perguntaria — a resposta vem com a origem de cada trecho.")}
+        </p>
+        <AcervoSearch />
       </section>
     </aside>
   );

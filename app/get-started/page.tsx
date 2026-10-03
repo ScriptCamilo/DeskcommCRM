@@ -43,7 +43,6 @@ export default async function GetStartedPage() {
   // Fora da árvore de `app/app/layout.tsx`, como as telas públicas: o idioma
   // vem do próprio usuário, e o formulário precisa do provider para o `useT()`.
   const t = (texto: string) => traduzir(texto, user.idioma);
-  const marca = await marcaDaSaida(null);
 
   // COM APROVAÇÃO (migration 0383): a mesma tela vira o pedido. A tabela só é
   // lida nesse modo — com a chave desligada, esta tela faz exatamente o que
@@ -51,6 +50,10 @@ export default async function GetStartedPage() {
   const comAprovacao = (await modoDeCadastro()) === "com_aprovacao";
   const pedido = comAprovacao ? await estadoDoPedido(user.id) : null;
   const aguardando = pedido === "pending" || pedido === "rejected";
+
+  // O nome em texto vem do resolvedor do BANCO (`marcaDaSaida`), não do
+  // `branding()` — o banco vence e o `.env` é o piso.
+  const marca = await marcaDaSaida(null);
 
   return (
     <IdiomaProvider locale={user.idioma}>

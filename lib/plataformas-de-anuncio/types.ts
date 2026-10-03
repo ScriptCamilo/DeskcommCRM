@@ -48,8 +48,11 @@ export type ApiDeConversaoGoogle = "google_ads" | "data_manager";
 
 export type PlataformaDeAnuncio = "meta_ads" | "google_ads";
 
-/** Venda e qualificação são resultados distintos e deduplicados separadamente. */
-export type NomeDoEvento = "Purchase" | "QualifiedLead";
+/**
+ * Venda, qualificação e cada etapa configurada são resultados distintos e
+ * deduplicados separadamente. `Etapa:<uuid>` vem das regras por etapa (0436).
+ */
+export type NomeDoEvento = "Purchase" | "QualifiedLead" | `Etapa:${string}`;
 
 /**
  * Uma conversão pronta para sair — no formato da CASA, não no da plataforma.
@@ -76,7 +79,11 @@ export interface ConversaoOffline {
    * um backlog de drain virar atribuição errada em vez de erro visível.
    */
   ocorridoEm: Date;
-  /** O clique que originou a conversa — `ad_source_id` do contato (0164). */
+  /**
+   * O clique que originou a conversa — `ad_source_id` do contato (0164).
+   * Vazio quando a pessoa chegou pela página com UTM da Meta: aí a identidade
+   * é só o telefone, e o transporte declara a origem de acordo.
+   */
   cliqueDeOrigem: string;
   identificadoresGoogle?: IdentificadoresGoogle;
   /** E.164 sem `+`, ainda EM CLARO: o hash é responsabilidade do transporte. */
@@ -132,6 +139,10 @@ export interface CredencialDeConversao {
     /** `null` = acesso direto, sem conta de gerente (MCC). */
     loginCustomerId: string | null;
     conversionActionId: string;
+    /** Negócio ganho sem valor (0436). Ausente = `obrigatorio`, o comportamento de sempre. */
+    modoDeValorDaVenda?: "obrigatorio" | "quando_houver" | "nunca";
+    /** Envia o telefone em SHA-256 (E.164) junto da conversão (0436). */
+    enviarTelefone?: boolean;
   };
 }
 

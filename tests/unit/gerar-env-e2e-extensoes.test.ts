@@ -29,6 +29,12 @@ exit 2
 `,
         { mode: 0o700 },
       );
+      // O gerador semeia uma chave no banco quando ele está acessível. Este
+      // cenário só prova o arquivo de ambiente: sem um dublê, o `psql` da
+      // estação tenta a porta sintética por até o timeout do SO.
+      writeFileSync(path.join(destino, "bin/psql"), "#!/usr/bin/env bash\nexit 1\n", {
+        mode: 0o700,
+      });
       const chave = Buffer.alloc(32, 1).toString("base64");
       writeFileSync(
         path.join(destino, ".env.e2e"),

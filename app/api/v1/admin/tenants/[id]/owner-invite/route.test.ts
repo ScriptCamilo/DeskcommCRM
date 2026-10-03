@@ -1,14 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
-import { mfaEmDivida } from "@/lib/auth/server";
-import { requirePlatformAdmin } from "@/lib/auth/requirePlatformAdmin";
+import { requirePlatformAdminEscrita } from "@/lib/auth/requirePlatformAdmin";
+import { EscritaDePlatformAdminNegada } from "@/lib/auth/recusa-de-escrita-de-admin";
 import { requireSupportWrite } from "@/lib/impersonate/support";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { emitirConvite } from "@/lib/team/convites";
 
-vi.mock("@/lib/auth/server", () => ({ mfaEmDivida: vi.fn() }));
-vi.mock("@/lib/auth/requirePlatformAdmin", () => ({ requirePlatformAdmin: vi.fn() }));
+vi.mock("@/lib/auth/requirePlatformAdmin", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/auth/requirePlatformAdmin")>()),
+  requirePlatformAdminEscrita: vi.fn(),
+}));
 vi.mock("@/lib/impersonate/support", () => ({ requireSupportWrite: vi.fn() }));
 vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: vi.fn() }));
 vi.mock("@/lib/team/convites", () => ({ emitirConvite: vi.fn() }));
@@ -77,7 +79,7 @@ async function chamar(id = ORG_ID) {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(requireSupportWrite).mockResolvedValue(null);
-  vi.mocked(requirePlatformAdmin).mockResolvedValue({
+  vi.mocked(requirePlatformAdminEscrita).mockResolvedValue({
     user: {
       id: ADMIN_ID,
       email: "admin@exemplo.com",
@@ -85,7 +87,6 @@ beforeEach(() => {
     },
     platformAdmin: { user_id: ADMIN_ID, scope: "full", mfa_required: true },
   } as never);
-  vi.mocked(mfaEmDivida).mockResolvedValue(false);
   vi.mocked(createAdminClient).mockReturnValue(adminStub() as never);
   vi.mocked(emitirConvite).mockResolvedValue({
     convite: {
@@ -108,14 +109,14 @@ describe("POST /api/v1/admin/tenants/[id]/owner-invite", () => {
   });
 
   it("exige administrador de plataforma com escopo full", async () => {
-    vi.mocked(requirePlatformAdmin).mockResolvedValue({
-      user: { id: ADMIN_ID },
-      platformAdmin: { user_id: ADMIN_ID, scope: "support", mfa_required: false },
-    } as never);
+    vi.mocked(requirePlatformAdminEscrita).mockRejectedValue(
+      new EscritaDePlatformAdminNegada("forbidden_scope"),
+    );
 
     const res = await chamar();
 
     expect(res.status).toBe(403);
+    await expect(res.json()).resolves.toMatchObject({ error: { code: "forbidden_scope" } });
     expect(createAdminClient).not.toHaveBeenCalled();
   });
 
