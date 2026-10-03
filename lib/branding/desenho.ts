@@ -93,11 +93,37 @@ export const LOGOTIPO = {
 } as const;
 
 /**
- * As cores da marca do produto, por tema — os mesmos graus da régua
- * (`regua-do-produto.ts`): sálvia 600/400 para o símbolo, neutro 900/0 para
- * o nome e neutro 600/300 para o "CRM". Copiadas dos SVGs de `docs/brand/`.
+ * Cores do wordmark por tema. O símbolo usa o gradiente fixo da identidade
+ * Chanti; nome e sufixo seguem a superfície clara ou escura onde ele aparece.
  */
 export const CORES_DA_MARCA = {
-  claro: { simbolo: "#506d48", nome: "#1c1a16", sufixo: "#5d594f" },
-  escuro: { simbolo: "#82a077", nome: "#f5f4ef", sufixo: "#8e8b7f" },
+  claro: { simbolo: "#8b3dff", nome: "#151827", sufixo: "#697386" },
+  escuro: { simbolo: "#37d6d0", nome: "#ffffff", sufixo: "#b8c1d1" },
+} as const;
+
+/**
+ * Símbolo-base deste fork: um C em fita arredondada com três pontos de conversa.
+ * A geometria segue a referência Chanti v1; o vetor final pode substituí-la sem
+ * mudar as rotas de favicon, PWA ou a regra de marca configurável.
+ */
+export const SIMBOLO_CHANTI = {
+  viewBox: "0 0 216 216",
+  fita: "M161 56A76 76 0 1 0 161 160",
+  pontos: [
+    { cx: 151, cy: 88, r: 7 },
+    { cx: 164, cy: 108, r: 7 },
+    { cx: 151, cy: 128, r: 7 },
+  ],
+  gradiente: {
+    inicio: "#8B3DFF",
+    meio: "#3B82F6",
+    fim: "#37D6D0",
+  },
+} as const;
+
+export const LOGOTIPO_CHANTI = {
+  viewBox: "0 0 760 216",
+  simbolo: "translate(8 0)",
+  nome: { x: 230, y: 126, texto: "Chanti" },
+  sufixo: { x: 574, y: 126, texto: "CRM" },
 } as const;

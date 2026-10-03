@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
-import { marcaEhADoProduto } from "@/lib/branding";
-import { CORES_DA_MARCA, SIMBOLO } from "@/lib/branding/desenho";
+import { DEFAULT_APP_NAME } from "@/lib/branding";
+import { SIMBOLO_CHANTI } from "@/lib/branding/desenho";
 import { letraDoIcone } from "@/lib/branding/icone";
 import { marcaDaSaida, NEUTROS_DE_SAIDA } from "@/lib/branding/saida";
 
@@ -37,13 +37,11 @@ import { marcaDaSaida, NEUTROS_DE_SAIDA } from "@/lib/branding/saida";
  *
  * ─── O símbolo do produto, quando a marca é a do produto ────────────────────
  *
- * Sem nome nem logo configurados (`marcaEhADoProduto`), o ladrilho é o símbolo
- * de `lib/branding/desenho.ts` sobre o creme da régua — o mesmo desenho que a
- * barra lateral e a fachada mostram, para a aba e a tela contarem a mesma
- * marca. O satori aceita `<svg>` inline (medido: 1.135 bytes de PNG válido com
- * o símbolo, em 2026-09-08), então continua sem rede e sem arquivo em `public/`.
- * Quem configurou um nome próprio segue com cor + inicial: o símbolo soletra
- * "D", e um "D" na aba de quem se chama "Acme" seria a nossa marca vazando.
+ * Quando o nome é o da marca-base, o ladrilho é o símbolo de
+ * `lib/branding/desenho.ts` sobre o creme da régua. Isso também vale quando o
+ * cabeçalho usa um logo comercial: a identidade instalada continua sendo do
+ * produto. Quem configurou outro nome segue com cor + inicial: um "C" na aba
+ * de quem se chama "Acme" seria a nossa marca vazando.
  *
  * ─── `force-dynamic` não é zelo ─────────────────────────────────────────────
  *
@@ -78,38 +76,12 @@ export const contentType = "image/png";
 export default async function Icon() {
   const marca = await marcaDaSaida(null);
 
-  if (marcaEhADoProduto({ name: marca.nome, logoUrl: marca.logoUrl })) {
-    // 78% da aresta: o D ocupa ~75% do próprio viewBox, então sobra o mesmo
-    // respiro que a letra tem no ramo de baixo.
+  // O ícone instalado representa o produto, mesmo quando o cabeçalho usa um
+  // logo comercial. Um favicon enviado na tela de Marca ainda tem prioridade.
+  if (marca.nome === DEFAULT_APP_NAME) {
+    // O C em fita ocupa 78% do ladrilho e mantém respiro em telas densas.
     const lado = Math.round(size.width * 0.78);
     return new ImageResponse(
-      (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: NEUTROS_DE_SAIDA.fundo,
-          }}
-        >
-          <svg viewBox={SIMBOLO.viewBox} width={lado} height={lado}>
-            <g fill={CORES_DA_MARCA.claro.simbolo} transform={SIMBOLO.transform}>
-              <path d={SIMBOLO.d} />
-              <rect {...SIMBOLO.modulo} />
-            </g>
-          </svg>
-        </div>
-      ),
-      { ...size, headers: CACHE },
-    );
-  }
-
-  const letra = letraDoIcone(marca.nome);
-
-  return new ImageResponse(
-    (
       <div
         style={{
           width: "100%",
@@ -117,19 +89,64 @@ export default async function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: marca.accent,
-          color: marca.accentFg,
-          // 62% da altura: a caixa maiúscula do Geist ocupa ~72% do em, então
-          // a letra fica com respiro sem virar um selo minúsculo no meio.
-          fontSize: Math.round(size.height * 0.62),
-          // O ladrilho é quadrado e cheio: o navegador já arredonda o favicon
-          // no chrome dele, e arredondar aqui também produz canto duplo.
-          borderRadius: 0,
+          background: NEUTROS_DE_SAIDA.fundo,
         }}
       >
-        {letra ?? ""}
-      </div>
-    ),
+        <svg viewBox={SIMBOLO_CHANTI.viewBox} width={lado} height={lado}>
+          <defs>
+            <linearGradient
+              id="chanti-ribbon-icon"
+              x1="38"
+              y1="42"
+              x2="178"
+              y2="172"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stopColor={SIMBOLO_CHANTI.gradiente.inicio} />
+              <stop offset="0.54" stopColor={SIMBOLO_CHANTI.gradiente.meio} />
+              <stop offset="1" stopColor={SIMBOLO_CHANTI.gradiente.fim} />
+            </linearGradient>
+          </defs>
+          <path
+            d={SIMBOLO_CHANTI.fita}
+            fill="none"
+            stroke="url(#chanti-ribbon-icon)"
+            strokeLinecap="round"
+            strokeWidth="30"
+          />
+          <g fill={SIMBOLO_CHANTI.gradiente.inicio}>
+            {SIMBOLO_CHANTI.pontos.map((ponto) => (
+              <circle key={`${ponto.cx}-${ponto.cy}`} {...ponto} />
+            ))}
+          </g>
+        </svg>
+      </div>,
+      { ...size, headers: CACHE },
+    );
+  }
+
+  const letra = letraDoIcone(marca.nome);
+
+  return new ImageResponse(
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: marca.accent,
+        color: marca.accentFg,
+        // 62% da altura: a caixa maiúscula do Geist ocupa ~72% do em, então
+        // a letra fica com respiro sem virar um selo minúsculo no meio.
+        fontSize: Math.round(size.height * 0.62),
+        // O ladrilho é quadrado e cheio: o navegador já arredonda o favicon
+        // no chrome dele, e arredondar aqui também produz canto duplo.
+        borderRadius: 0,
+      }}
+    >
+      {letra ?? ""}
+    </div>,
     { ...size, headers: CACHE },
   );
 }
