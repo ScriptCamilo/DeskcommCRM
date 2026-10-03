@@ -38,8 +38,10 @@ const TETO_POR_OUTRO_CAMINHO: Record<string, string> = {
   "app/api/v1/messages/route.ts": "checkRateLimit",
 };
 
+// A cerca guarda o contrato (chamar o teto e devolver a recusa), não o nome
+// local da autenticação nem uma normalização inofensiva do request id.
 const CHAMADA_COM_RETURN =
-  /const (\w+) = await tetoDeEscritaDoToken\(authz, "[^"]+", requestId\);\s*if \(\1\) return \1;/;
+  /const (\w+) = await tetoDeEscritaDoToken\(\w+, "[^"]+", requestId(?: \?\? "")?\);\s*if \(\1\) return \1;/;
 
 const rotasBearer = (readdirSync(BASE, { recursive: true }) as string[])
   .filter((rel) => path.basename(rel) === "route.ts")
