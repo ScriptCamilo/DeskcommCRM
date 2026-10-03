@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-import { marcaEhADoProduto } from "@/lib/branding";
+import { DEFAULT_APP_NAME } from "@/lib/branding";
 import { logger } from "@/lib/logger";
 
 import { SIMBOLO_CHANTI } from "./desenho";
@@ -57,7 +57,7 @@ export async function gerarIconeDoApp(
   arquivo: string | null,
 ): Promise<ArrayBuffer> {
   const desenhar = (imagem: string | null) => {
-    const produto = marcaEhADoProduto({ name: marca.nome, logoUrl: marca.logoUrl });
+    const produto = marca.nome === DEFAULT_APP_NAME;
     return new ImageResponse(
       <div
         style={{

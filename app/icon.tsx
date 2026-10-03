@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-import { marcaEhADoProduto } from "@/lib/branding";
+import { DEFAULT_APP_NAME } from "@/lib/branding";
 import { SIMBOLO_CHANTI } from "@/lib/branding/desenho";
 import { letraDoIcone } from "@/lib/branding/icone";
 import { marcaDaSaida, NEUTROS_DE_SAIDA } from "@/lib/branding/saida";
@@ -37,13 +37,11 @@ import { marcaDaSaida, NEUTROS_DE_SAIDA } from "@/lib/branding/saida";
  *
  * ─── O símbolo do produto, quando a marca é a do produto ────────────────────
  *
- * Sem nome nem logo configurados (`marcaEhADoProduto`), o ladrilho é o símbolo
- * de `lib/branding/desenho.ts` sobre o creme da régua — o mesmo desenho que a
- * barra lateral e a fachada mostram, para a aba e a tela contarem a mesma
- * marca. O satori aceita `<svg>` inline (medido: 1.135 bytes de PNG válido com
- * o símbolo, em 2026-09-08), então continua sem rede e sem arquivo em `public/`.
- * Quem configurou um nome próprio segue com cor + inicial: o símbolo soletra
- * "C", e um "C" na aba de quem se chama "Acme" seria a nossa marca vazando.
+ * Quando o nome é o da marca-base, o ladrilho é o símbolo de
+ * `lib/branding/desenho.ts` sobre o creme da régua. Isso também vale quando o
+ * cabeçalho usa um logo comercial: a identidade instalada continua sendo do
+ * produto. Quem configurou outro nome segue com cor + inicial: um "C" na aba
+ * de quem se chama "Acme" seria a nossa marca vazando.
  *
  * ─── `force-dynamic` não é zelo ─────────────────────────────────────────────
  *
@@ -78,7 +76,9 @@ export const contentType = "image/png";
 export default async function Icon() {
   const marca = await marcaDaSaida(null);
 
-  if (marcaEhADoProduto({ name: marca.nome, logoUrl: marca.logoUrl })) {
+  // O ícone instalado representa o produto, mesmo quando o cabeçalho usa um
+  // logo comercial. Um favicon enviado na tela de Marca ainda tem prioridade.
+  if (marca.nome === DEFAULT_APP_NAME) {
     // O C em fita ocupa 78% do ladrilho e mantém respiro em telas densas.
     const lado = Math.round(size.width * 0.78);
     return new ImageResponse(

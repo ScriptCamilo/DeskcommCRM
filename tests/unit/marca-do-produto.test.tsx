@@ -153,7 +153,7 @@ describe("o favicon segue a mesma regra", () => {
   const icone = fs.readFileSync(path.join(process.cwd(), "app/icon.tsx"), "utf8");
 
   it("desenha o símbolo quando a marca é a do produto, e a inicial quando não é", () => {
-    expect(icone).toMatch(/marcaEhADoProduto\(\{ name: marca\.nome, logoUrl: marca\.logoUrl \}\)/);
+    expect(icone).toMatch(/marca\.nome === DEFAULT_APP_NAME/);
     expect(icone).toMatch(/d=\{SIMBOLO_CHANTI\.fita\}/);
     expect(icone).toMatch(/letraDoIcone\(marca\.nome\)/);
   });
