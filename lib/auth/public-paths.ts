@@ -128,9 +128,9 @@ export const PUBLIC_PATHS: RegExp[] = [
   // como sair depois do corte de gateway.
   /^\/api\/v1\/conversations\/[^/]+\/media$/,
   // APP NATIVO. A sessão do Expo chega em Authorization e é verificada dentro
-  // das quatro rotas; o id precisa ser UUID para nenhum endpoint futuro sob
+  // das seis rotas; o id precisa ser UUID para nenhum endpoint futuro sob
   // /mobile ganhar bypass de proxy por carona.
-  /^\/api\/v1\/mobile\/conversations\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/(messages|media|notes|notes\/media)$/i,
+  /^\/api\/v1\/mobile\/conversations\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/(messages|media|notes|notes\/media|media\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|notes\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/media)$/i,
   // CONFIGURAÇÃO DE IA, FOLLOW-UP E AGENDA SERVER-TO-SERVER (issue #1875).
   // Mesma dualidade das linhas acima: sessão OU Bearer `dsk_…`, resolvidos por
   // `lib/api/auth-dual.ts` DENTRO de cada rota (a org sai da linha do token e

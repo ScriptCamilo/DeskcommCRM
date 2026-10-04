@@ -78,12 +78,15 @@ describe("isPublicPath", () => {
     expect(isPublicPath(`/api/v1/mobile/conversations/${conversation}/media`)).toBe(true);
     expect(isPublicPath(`/api/v1/mobile/conversations/${conversation}/notes`)).toBe(true);
     expect(isPublicPath(`/api/v1/mobile/conversations/${conversation}/notes/media`)).toBe(true);
+    expect(isPublicPath(`/api/v1/mobile/conversations/${conversation}/media/${conversation}`)).toBe(true);
+    expect(isPublicPath(`/api/v1/mobile/conversations/${conversation}/notes/${conversation}/media`)).toBe(true);
   });
 
   it("não abre o namespace mobile para caminhos futuros", () => {
     expect(isPublicPath("/api/v1/mobile/conversations/abc/messages")).toBe(false);
     expect(isPublicPath("/api/v1/mobile/conversations/11111111-1111-4111-8111-111111111111/delete")).toBe(false);
     expect(isPublicPath("/api/v1/mobile/conversations/11111111-1111-4111-8111-111111111111/notes/extra")).toBe(false);
+    expect(isPublicPath("/api/v1/mobile/conversations/11111111-1111-4111-8111-111111111111/media/extra")).toBe(false);
   });
 
   /**
