@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 import { audit } from "@/lib/audit";
 import { fail, ok } from "@/lib/api/wrappers";
 import { requireMobileConversation } from "@/lib/auth/mobile-conversation";
+import { requireSupportWrite } from "@/lib/impersonate/support";
 import { emitirMencoesDaNota } from "@/lib/inbox/emitir-mencoes-da-nota";
 import { isMediaPathOwnedBy } from "@/lib/messaging/media/upload-validation";
 import { assertOrgOperante, OrgNaoOperanteError } from "@/lib/organizacao/operante";
@@ -16,6 +17,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ): Promise<Response> {
+  const supportDenied = await requireSupportWrite();
+  if (supportDenied) return supportDenied;
   const requestId = randomUUID();
   const { id: conversationId } = await params;
   const authz = await requireMobileConversation(request, conversationId, requestId, "conversation_notes");

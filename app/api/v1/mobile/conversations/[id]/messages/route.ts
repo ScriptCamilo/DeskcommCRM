@@ -6,6 +6,7 @@ import { chaveDaRequisicao, comIdempotencia, type DesfechoIdempotente } from "@/
 import { ApiError } from "@/lib/api/types";
 import { fail, ok } from "@/lib/api/wrappers";
 import { requireMobileConversation } from "@/lib/auth/mobile-conversation";
+import { requireSupportWrite } from "@/lib/impersonate/support";
 import { sendMessageSchema, type SendMessageInput } from "@/lib/schemas";
 import type { Message } from "@/lib/types/messaging";
 
@@ -18,6 +19,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ): Promise<Response> {
+  const supportDenied = await requireSupportWrite();
+  if (supportDenied) return supportDenied;
   const requestId = randomUUID();
   const { id: conversationId } = await params;
   const authz = await requireMobileConversation(request, conversationId, requestId, "messages");
