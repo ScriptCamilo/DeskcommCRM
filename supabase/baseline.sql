@@ -5055,12 +5055,12 @@ create policy "crm_pipelines_select" on public.crm_pipelines
 
 create policy "crm_pipelines_manager_write" on public.crm_pipelines
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -5077,12 +5077,12 @@ create policy "crm_stages_select" on public.crm_stages
 
 create policy "crm_stages_manager_write" on public.crm_stages
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -5414,23 +5414,23 @@ drop policy if exists "conversations_agent_delete" on public.conversations;
 
 create policy "conversations_agent_insert" on public.conversations
   for insert with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent'))
   );
 create policy "conversations_agent_update" on public.conversations
   for update using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent'))
   ) with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent'))
   );
 create policy "conversations_agent_delete" on public.conversations
   for delete using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent'))
   );
@@ -5453,20 +5453,20 @@ create policy "messages_select" on public.messages
 create policy "messages_insert" on public.messages
   for insert with check (
     (organization_id in (select public.fn_user_org_ids()))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 create policy "messages_update" on public.messages
   for update using (
     (organization_id in (select public.fn_user_org_ids()))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   ) with check (
     (organization_id in (select public.fn_user_org_ids()))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 create policy "messages_delete" on public.messages
   for delete using (
     (organization_id in (select public.fn_user_org_ids()))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 
 -- Forward-fix do G4-01: fn_conversation_assign (0031/0032) passa a SECURITY
@@ -5598,7 +5598,7 @@ create policy "crm_leads_select" on public.crm_leads
 
 create policy "crm_leads_insert" on public.crm_leads
   for insert with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent')
         and (public.fn_role_at_least(organization_id, 'manager')
@@ -5606,13 +5606,13 @@ create policy "crm_leads_insert" on public.crm_leads
   );
 create policy "crm_leads_update" on public.crm_leads
   for update using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent')
         and (public.fn_role_at_least(organization_id, 'manager')
              or public.fn_can_view_lead(organization_id, owner_user_id)))
   ) with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent')
         and (public.fn_role_at_least(organization_id, 'manager')
@@ -5620,7 +5620,7 @@ create policy "crm_leads_update" on public.crm_leads
   );
 create policy "crm_leads_delete" on public.crm_leads
   for delete using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent')
         and (public.fn_role_at_least(organization_id, 'manager')
@@ -5822,12 +5822,12 @@ create policy "webhook_sources_select" on public.webhook_sources
 
 create policy "webhook_sources_manager_write" on public.webhook_sources
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -5843,12 +5843,12 @@ create policy "automation_rules_select" on public.automation_rules
 
 create policy "automation_rules_manager_write" on public.automation_rules
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -5895,7 +5895,7 @@ create policy "attendant_availability_select" on public.attendant_availability
 drop policy if exists "attendant_availability_insert" on public.attendant_availability;
 create policy "attendant_availability_insert" on public.attendant_availability
   for insert with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
         and (user_id = auth.uid()
              or public.fn_role_at_least(organization_id, 'manager')))
@@ -5904,12 +5904,12 @@ create policy "attendant_availability_insert" on public.attendant_availability
 drop policy if exists "attendant_availability_update" on public.attendant_availability;
 create policy "attendant_availability_update" on public.attendant_availability
   for update using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
         and (user_id = auth.uid()
              or public.fn_role_at_least(organization_id, 'manager')))
   ) with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
         and (user_id = auth.uid()
              or public.fn_role_at_least(organization_id, 'manager')))
@@ -5918,7 +5918,7 @@ create policy "attendant_availability_update" on public.attendant_availability
 drop policy if exists "attendant_availability_delete" on public.attendant_availability;
 create policy "attendant_availability_delete" on public.attendant_availability
   for delete using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
         and (user_id = auth.uid()
              or public.fn_role_at_least(organization_id, 'manager')))
@@ -5959,7 +5959,7 @@ create policy "attendant_availability_select" on public.attendant_availability
 drop policy if exists "attendant_availability_insert" on public.attendant_availability;
 create policy "attendant_availability_insert" on public.attendant_availability
   for insert with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
         and (user_id = auth.uid()
              or public.fn_role_at_least(organization_id, 'manager')))
@@ -5968,12 +5968,12 @@ create policy "attendant_availability_insert" on public.attendant_availability
 drop policy if exists "attendant_availability_update" on public.attendant_availability;
 create policy "attendant_availability_update" on public.attendant_availability
   for update using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
         and (user_id = auth.uid()
              or public.fn_role_at_least(organization_id, 'manager')))
   ) with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
         and (user_id = auth.uid()
              or public.fn_role_at_least(organization_id, 'manager')))
@@ -5982,7 +5982,7 @@ create policy "attendant_availability_update" on public.attendant_availability
 drop policy if exists "attendant_availability_delete" on public.attendant_availability;
 create policy "attendant_availability_delete" on public.attendant_availability
   for delete using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
         and (user_id = auth.uid()
              or public.fn_role_at_least(organization_id, 'manager')))
@@ -6230,7 +6230,7 @@ create policy "crm_lead_activities_select" on public.crm_lead_activities
 create policy "crm_lead_activities_insert" on public.crm_lead_activities
   for insert with check (
     (organization_id in (select public.fn_user_org_ids()))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 
 drop policy if exists "tenant_isolation_crm_lead_links_all" on public.crm_lead_links;
@@ -6251,20 +6251,20 @@ create policy "crm_lead_links_select" on public.crm_lead_links
 create policy "crm_lead_links_insert" on public.crm_lead_links
   for insert with check (
     (organization_id in (select public.fn_user_org_ids()))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 create policy "crm_lead_links_update" on public.crm_lead_links
   for update using (
     (organization_id in (select public.fn_user_org_ids()))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   ) with check (
     (organization_id in (select public.fn_user_org_ids()))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 create policy "crm_lead_links_delete" on public.crm_lead_links
   for delete using (
     (organization_id in (select public.fn_user_org_ids()))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 
 
@@ -11924,12 +11924,12 @@ create policy org_guardrail_layers_select on public.org_guardrail_layers
 
 create policy org_guardrail_layers_admin_write on public.org_guardrail_layers
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'admin'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'admin'))
   );
@@ -12462,11 +12462,11 @@ create policy channel_sessions_tenant_write on public.channel_sessions
   for all using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   ) with check (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 
 -- ---- agentes de IA ----
@@ -12483,11 +12483,11 @@ create policy tenant_isolation_ai_agents_write on public.ai_agents
   for all using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   ) with check (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 
 -- ---- versões de agente ----
@@ -12521,11 +12521,11 @@ create policy tenant_isolation_ai_budgets_write on public.ai_budgets
   for all using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   ) with check (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 
 -- ---- roteadores de IA ----
@@ -15822,12 +15822,12 @@ create policy calendar_event_types_select on public.calendar_event_types
 drop policy if exists calendar_event_types_write on public.calendar_event_types;
 create policy calendar_event_types_write on public.calendar_event_types
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -15844,12 +15844,12 @@ create policy calendar_appointments_select on public.calendar_appointments
 drop policy if exists calendar_appointments_write on public.calendar_appointments;
 create policy calendar_appointments_write on public.calendar_appointments
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent'))
   );
@@ -15866,12 +15866,12 @@ create policy calendar_availability_exceptions_select on public.calendar_availab
 drop policy if exists calendar_availability_exceptions_write on public.calendar_availability_exceptions;
 create policy calendar_availability_exceptions_write on public.calendar_availability_exceptions
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and (user_id = auth.uid() or public.fn_role_at_least(organization_id, 'manager')))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and (user_id = auth.uid() or public.fn_role_at_least(organization_id, 'manager')))
   );
@@ -16988,11 +16988,11 @@ create policy tenant_isolation_ai_knowledge_sources_write on public.ai_knowledge
   for all using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'manager'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   ) with check (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'manager'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 
 drop policy if exists tenant_isolation_ai_faq_items_all on public.ai_faq_items;
@@ -17024,11 +17024,11 @@ create policy tenant_isolation_ai_kbv_write on public.ai_knowledge_versions
   for all using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   ) with check (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 
 drop policy if exists tenant_isolation_ai_chunks_all on public.ai_chunks;
@@ -17044,11 +17044,11 @@ create policy tenant_isolation_ai_chunks_write on public.ai_chunks
   for all using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   ) with check (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
-    or public.fn_is_platform_admin()
+    or public.fn_is_platform_admin_full()
   );
 
 revoke all on table public.ai_knowledge_sources  from anon;
@@ -17509,12 +17509,12 @@ create policy catalog_products_select on public.catalog_products
 drop policy if exists catalog_products_write on public.catalog_products;
 create policy catalog_products_write on public.catalog_products
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -18186,12 +18186,12 @@ create policy crm_tasks_select on public.crm_tasks
 drop policy if exists crm_tasks_write on public.crm_tasks;
 create policy crm_tasks_write on public.crm_tasks
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent'))
   );
@@ -23795,12 +23795,12 @@ create policy team_invites_select on public.team_invites
 drop policy if exists team_invites_write on public.team_invites;
 create policy team_invites_write on public.team_invites
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'admin'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'admin'))
   );
@@ -24404,12 +24404,12 @@ create policy org_voice_calls_select on public.org_voice_calls
 
 create policy org_voice_calls_admin_write on public.org_voice_calls
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'admin'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'admin'))
   );
@@ -24546,7 +24546,7 @@ as $$
     'conversation.transferred',
     'whatsapp.chat_id_not_recognized',
     'whatsapp.conversation_mark_failed',
-    -- contato, lead, organização e plataforma
+    -- contato, lead, organização e plataforma ('lead.reopened' saiu na 0534: ele ganhou consumidor)
     'contact.anonymized',
     'contact.created',
     'contact.deleted',
@@ -24556,7 +24556,6 @@ as $$
     'lead.bulk_assigned',
     'lead.bulk_deleted',
     'lead.bulk_tagged',
-    'lead.reopened',
     'lead.risk_backlog_seeded',
     'lead.updated',
     'org.updated',
@@ -27059,7 +27058,7 @@ create policy calendar_locations_select on public.calendar_locations
 drop policy if exists calendar_locations_insert on public.calendar_locations;
 create policy calendar_locations_insert on public.calendar_locations
   for insert with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent'))
   );
@@ -28027,9 +28026,10 @@ begin
   end if;
   v_config := coalesce(p_configuration,v_link.configuration,v_manifest->'configuration');
   if v_config is null or jsonb_typeof(v_config) <> 'object'
-    or not (v_config ?& array['density','show_description']) or v_config - array['density','show_description'] <> '{}'::jsonb
+    or not (v_config ?& array['density','show_description']) or v_config - array['density','show_description','theme'] <> '{}'::jsonb
     or v_config->>'density' is null or v_config->>'density' not in ('comfortable','compact')
-    or jsonb_typeof(v_config->'show_description') is distinct from 'boolean' then
+    or jsonb_typeof(v_config->'show_description') is distinct from 'boolean'
+    or (v_config ? 'theme' and (v_config->>'theme' is null or v_config->>'theme' not in ('sage','clay','mist','plum','olive'))) then
     raise exception using errcode='P0001',message='extension_invalid_input';
   end if;
   if p_enabled and not coalesce(v_link.enabled,false) and
@@ -32021,13 +32021,14 @@ create or replace function public.fn_extensions_permissoes_validas(p_permissions
 returns boolean language sql immutable set search_path = public, pg_temp as $$
   select p_permissions is not null
     and jsonb_typeof(p_permissions) = 'array'
-    and jsonb_array_length(p_permissions) between 1 and 6
+    and jsonb_array_length(p_permissions) between 1 and 7
     and not exists (
       select 1 from jsonb_array_elements(p_permissions) e
       where jsonb_typeof(e.value) <> 'string'
          or e.value #>> '{}' not in (
               'navigation.tasks', 'navigation.inbox', 'navigation.kanban',
-              'navigation.contacts', 'navigation.agenda', 'navigation.radar')
+              'navigation.contacts', 'navigation.agenda', 'navigation.radar',
+              'theme.apply')
     )
     and (select count(distinct e.value) from jsonb_array_elements(p_permissions) e)
         = jsonb_array_length(p_permissions);
@@ -33486,13 +33487,22 @@ declare t text;
 begin
   foreach t in array array['financial_accounts', 'payment_methods', 'account_plans'] loop
     execute format('alter table public.%I enable row level security', t);
+    -- 0533: o _all virou par. Leitura com a função pura (support_readonly segue
+    -- lendo); escrita exige scope='full'.
     execute format('drop policy if exists tenant_isolation_%I_all on public.%I', t, t);
+    execute format('drop policy if exists tenant_isolation_%I_read on public.%I', t, t);
     execute format($f$
-      create policy tenant_isolation_%I_all on public.%I
-        for all
+      create policy tenant_isolation_%I_read on public.%I
+        for select
         using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin())
+    $f$, t, t);
+    execute format('drop policy if exists tenant_isolation_%I_write on public.%I', t, t);
+    execute format($f$
+      create policy tenant_isolation_%I_write on public.%I
+        for all
+        using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full())
         with check (
-          public.fn_is_platform_admin()
+          public.fn_is_platform_admin_full()
           or (organization_id in (select public.fn_user_org_ids())
               and public.fn_role_at_least(organization_id, 'manager'))
         )
@@ -34002,13 +34012,22 @@ begin
   foreach t in array array['sales', 'sale_items', 'commission_rules', 'commissions',
                            'financial_entries', 'loyalty_ledger'] loop
     execute format('alter table public.%I enable row level security', t);
+    -- 0533: o _all virou par. Leitura com a função pura (support_readonly segue
+    -- lendo); escrita exige scope='full'.
     execute format('drop policy if exists tenant_isolation_%I_all on public.%I', t, t);
+    execute format('drop policy if exists tenant_isolation_%I_read on public.%I', t, t);
     execute format($f$
-      create policy tenant_isolation_%I_all on public.%I
-        for all
+      create policy tenant_isolation_%I_read on public.%I
+        for select
         using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin())
+    $f$, t, t);
+    execute format('drop policy if exists tenant_isolation_%I_write on public.%I', t, t);
+    execute format($f$
+      create policy tenant_isolation_%I_write on public.%I
+        for all
+        using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full())
         with check (
-          public.fn_is_platform_admin()
+          public.fn_is_platform_admin_full()
           or (organization_id in (select public.fn_user_org_ids())
               and public.fn_role_at_least(organization_id, 'agent'))
         )
@@ -34343,11 +34362,16 @@ create unique index if not exists financial_entries_recorrencia_competencia_idx
 
 alter table public.recurring_entries enable row level security;
 drop policy if exists tenant_isolation_recurring_entries_all on public.recurring_entries;
-create policy tenant_isolation_recurring_entries_all on public.recurring_entries
+drop policy if exists tenant_isolation_recurring_entries_read on public.recurring_entries;
+create policy tenant_isolation_recurring_entries_read on public.recurring_entries
+  for select
+  using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
+drop policy if exists tenant_isolation_recurring_entries_write on public.recurring_entries;
+create policy tenant_isolation_recurring_entries_write on public.recurring_entries
   for all
-  using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin())
+  using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full())
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -34968,7 +34992,7 @@ returns boolean language sql stable security definer set search_path=public as $
   join public.organizations o on o.id=a.organization_id and o.status='active'
   where cs.archived_at is null and a.meeting_delivery->>'channel_session_id'=cs.id::text and j.organization_id=p_org and j.id=p_job and j.kind='transactional_delivery' and j.status='running' and j.locked_by=p_worker and j.locked_at=p_acquired_at
    and a.contact_id=j.contact_id and not c.is_anonymized and not c.is_blocked and a.status<>'cancelled' and (a.location_kind<>'google_meet' or (a.meeting_state='ready' and a.meeting_url is not null))
-   and a.meeting_request_id::text=j.payload->>'meeting_request_id' and a.meeting_delivery->>'generation'=j.payload->>'delivery_generation'
+   and a.meeting_request_id::text is not distinct from j.payload->>'meeting_request_id' and a.meeting_delivery->>'generation'=j.payload->>'delivery_generation'
    and a.meeting_delivery_job_id=j.id and a.meeting_delivery->>'state'='queued'
    and exists(select 1 from public.user_organizations where organization_id=p_org and user_id=a.owner_user_id and revoked_at is null)
    and (a.meeting_delivery->'authorized_by'->>'kind'='ai_agent' or
@@ -36374,12 +36398,12 @@ create policy campaigns_select on public.campaigns
 drop policy if exists campaigns_write on public.campaigns;
 create policy campaigns_write on public.campaigns
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -36400,12 +36424,12 @@ create policy campaign_recipients_select on public.campaign_recipients
 drop policy if exists campaign_recipients_write on public.campaign_recipients;
 create policy campaign_recipients_write on public.campaign_recipients
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -36554,12 +36578,12 @@ create policy campaign_templates_select on public.campaign_templates
 drop policy if exists campaign_templates_write on public.campaign_templates;
 create policy campaign_templates_write on public.campaign_templates
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -36579,12 +36603,12 @@ create policy campaign_suppressions_select on public.campaign_suppressions
 drop policy if exists campaign_suppressions_write on public.campaign_suppressions;
 create policy campaign_suppressions_write on public.campaign_suppressions
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -36691,12 +36715,12 @@ create policy campaign_channel_sessions_select on public.campaign_channel_sessio
 drop policy if exists campaign_channel_sessions_write on public.campaign_channel_sessions;
 create policy campaign_channel_sessions_write on public.campaign_channel_sessions
   using (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   )
   with check (
-    public.fn_is_platform_admin()
+    public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'manager'))
   );
@@ -36948,7 +36972,7 @@ begin
   create policy honorarios_contratos_insert
     on public.honorarios_contratos
     for insert
-    with check (public.fn_is_platform_admin()
+    with check (public.fn_is_platform_admin_full()
                 or (organization_id in (select public.fn_user_org_ids())
                     and public.fn_role_at_least(organization_id, 'manager')));
 
@@ -36956,10 +36980,10 @@ begin
   create policy honorarios_contratos_update
     on public.honorarios_contratos
     for update
-    using (public.fn_is_platform_admin()
+    using (public.fn_is_platform_admin_full()
            or (organization_id in (select public.fn_user_org_ids())
                and public.fn_role_at_least(organization_id, 'manager')))
-    with check (public.fn_is_platform_admin()
+    with check (public.fn_is_platform_admin_full()
                 or (organization_id in (select public.fn_user_org_ids())
                     and public.fn_role_at_least(organization_id, 'manager')));
 
@@ -36967,7 +36991,7 @@ begin
   create policy honorarios_contratos_delete
     on public.honorarios_contratos
     for delete
-    using ((public.fn_is_platform_admin()
+    using ((public.fn_is_platform_admin_full()
             or (organization_id in (select public.fn_user_org_ids())
                 and public.fn_role_at_least(organization_id, 'manager')))
            and not exists (select 1 from public.honorarios_parcelas p
@@ -36988,7 +37012,7 @@ begin
   create policy honorarios_parcelas_insert
     on public.honorarios_parcelas
     for insert
-    with check ((public.fn_is_platform_admin()
+    with check ((public.fn_is_platform_admin_full()
                  or (organization_id in (select public.fn_user_org_ids())
                      and public.fn_role_at_least(organization_id, 'manager')))
                 and status <> 'pago' and financial_entry_id is null
@@ -37000,11 +37024,11 @@ begin
   create policy honorarios_parcelas_update
     on public.honorarios_parcelas
     for update
-    using ((public.fn_is_platform_admin()
+    using ((public.fn_is_platform_admin_full()
             or (organization_id in (select public.fn_user_org_ids())
                 and public.fn_role_at_least(organization_id, 'manager')))
            and status <> 'pago')
-    with check ((public.fn_is_platform_admin()
+    with check ((public.fn_is_platform_admin_full()
                  or (organization_id in (select public.fn_user_org_ids())
                      and public.fn_role_at_least(organization_id, 'manager')))
                 and status <> 'pago' and financial_entry_id is null
@@ -37016,7 +37040,7 @@ begin
   create policy honorarios_parcelas_delete
     on public.honorarios_parcelas
     for delete
-    using ((public.fn_is_platform_admin()
+    using ((public.fn_is_platform_admin_full()
             or (organization_id in (select public.fn_user_org_ids())
                 and public.fn_role_at_least(organization_id, 'manager')))
            and status <> 'pago');
@@ -38723,7 +38747,7 @@ declare c public.contacts; support jsonb; v_quando timestamptz;
 begin
  support:=public.fn_support_context();
  if auth.uid() is null or not public.fn_support_write_allowed(p_organization_id)
-  or not (public.fn_role_at_least(p_organization_id,'admin') or (public.fn_is_platform_admin() and support is null)) then
+  or not (public.fn_role_at_least(p_organization_id,'admin') or (public.fn_is_platform_admin_full() and support is null)) then
   raise exception 'contact_anonymize_forbidden' using errcode='42501';
  end if;
  if not public.fn_session_mfa_proven() then raise exception 'contact_anonymize_mfa_required' using errcode='42501';end if;
@@ -44562,6 +44586,226 @@ end; $$;
 revoke execute on function public.fn_service_status(uuid,uuid,text,bigint) from public,anon,authenticated;
 grant execute on function public.fn_service_status(uuid,uuid,text,bigint) to service_role;
 
+-- ---- a anotação simultânea não apaga a outra (migration 0502) ----
+-- 0502 — duas anotações ao mesmo tempo não apagam uma à outra.
+--
+-- ─── O defeito, medido na main de 2026-09-30 ────────────────────────────────
+--
+-- `updateLeadHandler` (`app/api/v1/leads/_handler.ts`) mesclava `custom_fields`
+-- NO APLICATIVO:
+--
+--     const prev = existing.custom_fields …        -- lido no SELECT, lá em cima
+--     patch.custom_fields = { ...prev, ...input.custom_fields };
+--
+-- `existing` vem de uma leitura anterior. Duas escritas simultâneas com chaves
+-- DIFERENTES perdem uma: a segunda leu `prev` antes de a primeira gravar, e
+-- sobrescreve a coluna inteira com a versão velha mais a chave dela. Ninguém
+-- recebe erro. O dado some.
+--
+-- ─── Quem chega a esse ponto ────────────────────────────────────────────────
+--
+-- O handler serve dois caminhos: o `PATCH /api/v1/leads/[id]` (o formulário do
+-- dossiê) e a ferramenta MCP `crm_update_lead` (o assistente, integrações). Os
+-- dois podem escrever a mesma ficha ao mesmo tempo — quem atende salvando na
+-- tela enquanto o assistente anota. A rota `move` NÃO tem este defeito: o
+-- `update` dela exige `updated_at = expected_updated_at`, então uma leitura velha
+-- vira conflito, não dado perdido. O `PATCH` do lead não tem esse controle.
+--
+-- ⚠️ Limite: o formulário do dossiê (`LeadFieldsForm`, `CRMSidePanel`) envia o
+-- objeto `custom_fields` INTEIRO que carregou ao abrir. Uma chave que a ficha
+-- não tinha ao abrir agora sobrevive à gravação dela; uma chave que a ficha já
+-- mostrava ainda volta ao valor velho do formulário. Esta função fecha a
+-- corrida no servidor, não o payload velho do cliente.
+--
+-- ─── Por que uma função, e não uma linha no handler ─────────────────────────
+--
+-- O handler grava pelo PostgREST (`supabase.update()`), e ele não sabe dizer
+-- `custom_fields = coalesce(custom_fields,'{}'::jsonb) || $1::jsonb` — só sabe
+-- mandar um VALOR pronto, que é justamente o valor calculado a partir de uma
+-- leitura velha. A conta tem de acontecer DENTRO do `UPDATE`.
+--
+-- ─── Por que isso basta (medido, não suposto) ──────────────────────────────
+--
+-- Numa ÚNICA instrução `update … set custom_fields = custom_fields || $1`, em
+-- READ COMMITTED (o padrão do PostgREST), a segunda transação ESPERA o commit
+-- da primeira e RECALCULA a expressão sobre a versão nova da linha. Por isso ela
+-- soma sobre o que a primeira gravou, em vez de sobre o que leu antes.
+--
+-- Um `select … for update` antes NÃO é necessário: o invariante
+-- `anotacao-simultanea-nao-apaga-a-outra.test.ts` passou igual com e sem ele.
+-- O que quebra o conserto é o oposto — ler o valor para uma variável e gravar
+-- depois, que reintroduz a leitura velha (o invariante fica vermelho assim).
+-- Em REPEATABLE READ ou SERIALIZABLE a segunda transação recebe 40001 em vez de
+-- sobrescrever: falha alta, nunca dado perdido em silêncio.
+--
+-- ─── O que esta função NÃO faz ──────────────────────────────────────────────
+--
+-- Ela não decide QUEM pode escrever o quê: papel e organização são de quem
+-- chama (o handler resolve a organização de fonte confiável, nunca do body).
+-- Aqui só se garante que nenhuma escrita apague a outra por acidente de relógio.
+-- Misturar as duas coisas faria uma função que ninguém consegue auditar.
+--
+-- `||` em `jsonb` é raso de propósito: campo de funil é chave→valor, sem
+-- aninhamento. Merge profundo mudaria o significado de "apagar um campo".
+--
+-- Idempotente: `create or replace` e revoke/grant reaplicáveis. Sem constraint
+-- nem dado a corrigir.
+
+create or replace function public.fn_lead_anotar_campos(
+  p_org uuid, p_lead uuid, p_campos jsonb
+) returns jsonb language plpgsql security definer set search_path = public, pg_temp as $fn$
+declare
+  resultado jsonb;
+begin
+  if p_campos is null or jsonb_typeof(p_campos) <> 'object' then
+    raise exception 'campos_precisa_ser_objeto' using errcode = '22023';
+  end if;
+
+  -- UMA instrução, sem leitura prévia: a conta `custom_fields || p_campos` é
+  -- refeita sobre a linha vigente quando há escrita concorrente (ver cabeçalho).
+  -- Sem linha (lead inexistente OU de outra organização) nada é gravado e
+  -- `resultado` fica nulo. Silêncio de propósito: quem pede um lead que não é da
+  -- organização dele não recebe confirmação de que ele existe em outro lugar.
+  update public.crm_leads
+     set custom_fields = coalesce(custom_fields, '{}'::jsonb) || p_campos
+   where organization_id = p_org and id = p_lead
+   returning custom_fields into resultado;
+
+  return resultado;
+end $fn$;
+
+-- Função nova em `public` NASCE EXPOSTA, e são DUAS origens de EXECUTE: o
+-- `ALTER DEFAULT PRIVILEGES … GRANT ALL ON FUNCTIONS` do corpo do baseline (que
+-- alcança toda função criada depois dele, para anon, authenticated E
+-- service_role) e o grant a PUBLIC que o Postgres dá a qualquer função ao
+-- criá-la. Revogar só de `public, anon` deixaria esta função — que ESCREVE —
+-- executável por qualquer usuário logado de QUALQUER organização.
+-- `tests/invariants/hardening-definer-varredura.test.ts` cobra as duas origens.
+revoke all on function public.fn_lead_anotar_campos(uuid, uuid, jsonb) from public, anon, authenticated;
+grant execute on function public.fn_lead_anotar_campos(uuid, uuid, jsonb) to service_role;
+
+comment on function public.fn_lead_anotar_campos(uuid, uuid, jsonb) is
+  'Mescla campos personalizados no lead DENTRO do banco, numa única instrução atômica. '
+  'Existe porque o merge no aplicativo perdia escrita concorrente em silêncio. '
+  'Não decide papel nem organização — isso é de quem chama.';
+
+notify pgrst, 'reload schema';
+
+-- ---- conversão da Meta por etapa do funil (migration 0524) ----
+--
+-- Racional inteiro na migration 0524. Cria função, então fica ANTES da varredura de anon.
+create table if not exists public.meta_ads_conversion_rules (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  stage_id uuid not null,
+  event_name text not null,
+  meta_event text not null,
+  enabled boolean not null default true,
+  configured_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  updated_by uuid,
+  constraint meta_ads_conversion_rules_evento_do_livro
+    check (event_name ~ '^MetaEtapa:[0-9a-f-]{36}$'),
+  constraint meta_ads_conversion_rules_evento_conhecido
+    check (meta_event in (
+      'LeadSubmitted', 'QualifiedLead', 'InitiateCheckout', 'AddToCart', 'ViewContent'
+    ))
+);
+
+alter table public.meta_ads_conversion_rules
+  drop constraint if exists meta_ads_conversion_rules_stage_org_fk;
+alter table public.meta_ads_conversion_rules
+  add constraint meta_ads_conversion_rules_stage_org_fk
+  foreign key (organization_id, stage_id)
+  references public.crm_stages (organization_id, id)
+  on delete cascade;
+
+create unique index if not exists meta_ads_conversion_rules_org_stage_uk
+  on public.meta_ads_conversion_rules (organization_id, stage_id);
+create unique index if not exists meta_ads_conversion_rules_org_event_uk
+  on public.meta_ads_conversion_rules (organization_id, event_name);
+
+comment on table public.meta_ads_conversion_rules is
+  'Qual evento padrão da Meta cada etapa do funil envia quando um negócio entra nela. event_name (MetaEtapa:<uuid>) é a chave do livro-razão ad_conversion_dispatches. Server-side only: RLS sem policy e grants revogados de anon/authenticated.';
+comment on column public.meta_ads_conversion_rules.configured_at is
+  'Trava de retroatividade: só movimentos de etapa posteriores enviam. Regravada pelo gatilho quando a etapa ou o evento mudam, ou quando a regra é religada.';
+
+alter table public.meta_ads_conversion_rules enable row level security;
+revoke all on public.meta_ads_conversion_rules from anon, authenticated;
+grant select, insert, update, delete on public.meta_ads_conversion_rules to service_role;
+
+drop trigger if exists trg_meta_ads_conversion_rules_updated_at on public.meta_ads_conversion_rules;
+create trigger trg_meta_ads_conversion_rules_updated_at
+  before update on public.meta_ads_conversion_rules
+  for each row execute function public.fn_set_updated_at();
+
+create or replace function public.fn_marcar_configuracao_regra_meta()
+returns trigger language plpgsql set search_path = public as $$
+begin
+  if tg_op = 'INSERT' then
+    new.configured_at := coalesce(new.configured_at, now());
+  elsif new.stage_id is distinct from old.stage_id
+     or new.meta_event is distinct from old.meta_event
+     or (new.enabled and not old.enabled) then
+    new.configured_at := now();
+  else
+    new.configured_at := old.configured_at;
+  end if;
+  return new;
+end;
+$$;
+revoke execute on function public.fn_marcar_configuracao_regra_meta() from public, anon, authenticated;
+grant execute on function public.fn_marcar_configuracao_regra_meta() to service_role;
+
+drop trigger if exists trg_marcar_configuracao_regra_meta on public.meta_ads_conversion_rules;
+create trigger trg_marcar_configuracao_regra_meta
+  before insert or update on public.meta_ads_conversion_rules
+  for each row execute function public.fn_marcar_configuracao_regra_meta();
+
+alter table public.ad_conversion_dispatches
+  add column if not exists meta_event_name text;
+
+comment on column public.ad_conversion_dispatches.meta_event_name is
+  'Retrato do evento de etapa da Meta (0524): o nome que saiu no fio. Reenviar usa este, nunca a regra de agora.';
+
+-- O reenvio passa a aceitar os eventos de etapa da Meta, com a mesma exigência
+-- dos do Google: só reenvia o que tem o retrato (quando + qual evento) gravado.
+create or replace function public.fn_solicitar_reenvio_conversao(p_org uuid, p_lead uuid, p_event text)
+returns boolean language plpgsql set search_path = public as $$
+declare v_linha public.ad_conversion_dispatches%rowtype;
+begin
+  if p_event is null or not (
+    p_event in ('Purchase', 'QualifiedLead')
+    or p_event ~ '^Etapa:[0-9a-f-]{36}$'
+    or p_event ~ '^MetaEtapa:[0-9a-f-]{36}$'
+  ) then
+    return false;
+  end if;
+  select * into v_linha from public.ad_conversion_dispatches
+    where organization_id = p_org and lead_id = p_lead and event_name = p_event for update;
+  if not found or v_linha.status = 'sent' then return false; end if;
+  if p_event ~ '^MetaEtapa:' then
+    if v_linha.event_occurred_at is null or v_linha.meta_event_name is null then return false; end if;
+  elsif p_event <> 'Purchase' and (v_linha.event_occurred_at is null or v_linha.google_action_id is null) then
+    return false;
+  end if;
+  if p_event = 'Purchase' and v_linha.remote_request_id is null and not exists (
+    select 1 from public.crm_leads where id = p_lead and organization_id = p_org and status = 'won'
+  ) then return false; end if;
+  if exists (select 1 from public.event_log where organization_id = p_org and entity_id = p_lead
+    and event_type = 'ad_conversion.retry_requested' and status in ('pending', 'processing')
+    and coalesce(payload->>'event_name', 'Purchase') = p_event) then return false; end if;
+  perform public.emit_event('ad_conversion.retry_requested', 'crm_lead', p_lead,
+    jsonb_build_object('event_name', p_event), '{}'::jsonb, p_org);
+  update public.ad_conversion_dispatches set reason = 'reprocessamento_solicitado', attempted_at = now()
+    where id = v_linha.id and organization_id = p_org;
+  return true;
+end;
+$$;
+revoke execute on function public.fn_solicitar_reenvio_conversao(uuid, uuid, text) from public, anon, authenticated;
+grant execute on function public.fn_solicitar_reenvio_conversao(uuid, uuid, text) to service_role;
+
 -- ---- VARREDURA anon: função nova nasce exposta em quem ATUALIZA (migration 0116) ----
 --
 -- ⚠️ DE PROPÓSITO, NENHUMA FUNÇÃO É CRIADA DEPOIS DESTE BLOCO. Apêndice que cria
@@ -45863,15 +46107,39 @@ create policy "conversation_notes_select" on public.conversation_notes
     )
   );
 
--- ⚠️ A política de ESCRITA precisa da MESMA condição: policies são OR e
--- `conversation_notes_write` é `for all`, que concede SELECT junto — sem isto
--- a policy nova de SELECT é anulada. O teste `F2: ... não lê a nota` pegou
--- exatamente isso (devolveu 1 em vez de 0) antes do conserto.
+-- ⚠️ A política de ESCRITA precisa da MESMA condição de visibilidade: policies
+-- são OR e `for all` concede SELECT junto — sem isto a policy nova de SELECT é
+-- anulada. O teste `F2: ... não lê a nota` pegou exatamente isso (devolveu 1 em
+-- vez de 0) antes do conserto (0478).
+--
+-- Desde a 0509 a escrita é por OPERAÇÃO (formato 0464/0489/0490, issue #1870):
+-- entre quem VÊ a conversa, editar e apagar são só do AUTOR (`created_by_user_id`)
+-- ou de manager+ da organização — a policy `for all` não distinguia o autor e
+-- qualquer agent podia mexer na nota de um colega pelo PostgREST. Molde da
+-- rota DELETE, que já era autor+/manager+ no app.
 drop policy if exists "conversation_notes_write" on public.conversation_notes;
-create policy "conversation_notes_write" on public.conversation_notes
-  for all using (
+drop policy if exists "conversation_notes_insert" on public.conversation_notes;
+create policy "conversation_notes_insert" on public.conversation_notes
+  for insert
+  with check (
     organization_id in (select public.fn_user_org_ids())
     and public.fn_role_at_least(organization_id, 'agent')
+    and created_by_user_id = auth.uid()
+    and exists (
+      select 1 from public.conversations c
+      where c.organization_id = conversation_notes.organization_id
+        and c.id = conversation_notes.conversation_id
+        and public.fn_can_view_conversation(c.organization_id, c.assigned_to_user_id)
+    )
+  );
+
+drop policy if exists "conversation_notes_update" on public.conversation_notes;
+create policy "conversation_notes_update" on public.conversation_notes
+  for update
+  using (
+    organization_id in (select public.fn_user_org_ids())
+    and public.fn_role_at_least(organization_id, 'agent')
+    and (created_by_user_id = auth.uid() or public.fn_role_at_least(organization_id, 'manager'))
     and exists (
       select 1 from public.conversations c
       where c.organization_id = conversation_notes.organization_id
@@ -45882,6 +46150,22 @@ create policy "conversation_notes_write" on public.conversation_notes
   with check (
     organization_id in (select public.fn_user_org_ids())
     and public.fn_role_at_least(organization_id, 'agent')
+    and (created_by_user_id = auth.uid() or public.fn_role_at_least(organization_id, 'manager'))
+    and exists (
+      select 1 from public.conversations c
+      where c.organization_id = conversation_notes.organization_id
+        and c.id = conversation_notes.conversation_id
+        and public.fn_can_view_conversation(c.organization_id, c.assigned_to_user_id)
+    )
+  );
+
+drop policy if exists "conversation_notes_delete" on public.conversation_notes;
+create policy "conversation_notes_delete" on public.conversation_notes
+  for delete
+  using (
+    organization_id in (select public.fn_user_org_ids())
+    and public.fn_role_at_least(organization_id, 'agent')
+    and (created_by_user_id = auth.uid() or public.fn_role_at_least(organization_id, 'manager'))
     and exists (
       select 1 from public.conversations c
       where c.organization_id = conversation_notes.organization_id
@@ -46231,6 +46515,40 @@ alter table public.ai_agent_versions
   add constraint ai_agent_versions_inbound_debounce_ms_check
   check (inbound_debounce_ms is null or (inbound_debounce_ms >= 0 and inbound_debounce_ms <= 60000));
 
+-- ---- a chave de mapas da organização (migration 0504) ----
+-- Pino do WhatsApp → rua/cidade/região aproximados (lib/mapas/). Server-side only.
+create table if not exists public.map_provider_credentials (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  provider text not null default 'google_maps',
+  api_key_encrypted bytea not null,
+  -- Para a tela reconhecer QUAL chave está gravada sem ver a chave.
+  api_key_last4 text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  updated_by uuid,
+  constraint map_provider_credentials_provider_conhecido
+    check (provider in ('google_maps'))
+);
+
+-- Uma chave por provedor por organização: trocar é gravar de novo (upsert).
+create unique index if not exists map_provider_credentials_org_provider_uk
+  on public.map_provider_credentials (organization_id, provider);
+
+comment on table public.map_provider_credentials is
+  'Chave de mapas da organização (hoje: Google Geocoding API), usada para transformar o pino de localização do WhatsApp em rua/cidade/região aproximados. Opcional. Server-side only: RLS ligada sem policies e grants revogados de anon/authenticated. A chave nunca volta ao browser.';
+comment on column public.map_provider_credentials.api_key_encrypted is
+  'Cifrado por fn_encrypt_oauth (pgp_sym/aes256), a mesma cifra de channel_sessions e ad_platform_connections.';
+
+alter table public.map_provider_credentials enable row level security;
+revoke all on public.map_provider_credentials from anon, authenticated;
+grant select, insert, update, delete on public.map_provider_credentials to service_role;
+
+drop trigger if exists trg_map_provider_credentials_updated_at on public.map_provider_credentials;
+create trigger trg_map_provider_credentials_updated_at
+  before update on public.map_provider_credentials
+  for each row execute function public.fn_set_updated_at();
+
 -- ---- avisos do Security Advisor: search_path fixo e definer só do servidor (migration 0521) ----
 -- Cópia das instruções da migration 0521 (o porquê está no cabeçalho dela). Só ALTER/REVOKE:
 -- não cria função, então pode ficar depois da VARREDURA anon.
@@ -46259,6 +46577,30 @@ begin
   end loop;
 end
 $$;
+
+-- 0520 (#1095, de @webtecnica): o gancho de TEMA. A permissão `theme.apply`
+-- entra no conjunto fechado (`fn_extensions_permissoes_validas`, bloco acima) e
+-- a configuração do vínculo passa a admitir UMA chave opcional `theme` = a
+-- paleta escolhida pela organização. Par drop/add da CHECK para o `update.sh`
+-- reaplicar sem 'already exists' — quem aplica SÓ o baseline é justamente quem
+-- mais precisa desta definição, porque ali a cadeia de migrations não roda.
+alter table public.organization_extensions
+  drop constraint if exists organization_extensions_configuration_check;
+
+alter table public.organization_extensions
+  add constraint organization_extensions_configuration_check
+  check (
+    jsonb_typeof(configuration) = 'object'
+    and configuration ?& array['density','show_description']
+    and configuration - array['density','show_description','theme'] = '{}'::jsonb
+    and configuration->>'density' is not null
+    and configuration->>'density' in ('comfortable','compact')
+    and jsonb_typeof(configuration->'show_description') = 'boolean'
+    and (
+      not (configuration ? 'theme')
+      or configuration->>'theme' in ('sage','clay','mist','plum','olive')
+    )
+  );
 
 -- ---- o audit log é só-inclusão para TODO papel que não seja o dono (migration 0525) ----
 --
@@ -46298,3 +46640,67 @@ begin
   end loop;
 end
 $$;
+
+-- ---- seleção de empresas na prospecção, issue #1896 (migration 0506) ----
+-- O operador escolhe quais empresas da busca entram na fila. Padrão TUDO
+-- marcado: quem só atualiza continua com a mesma fila de antes.
+alter table public.prospecting_candidates
+  add column if not exists selected boolean not null default true;
+
+-- ---- dedupe de midia_nao_lida atômico: índice único parcial (migration 0527) ----
+with repetidas as (
+  select id,
+         row_number() over (
+           partition by organization_id, kind
+           order by created_at asc, id asc
+         ) as ordem
+    from public.agent_inbox_items
+   where status = 'open'
+     and kind = 'midia_nao_lida'
+)
+update public.agent_inbox_items i
+   set status = 'resolved',
+       resolved_at = now()
+  from repetidas r
+ where i.id = r.id
+   and r.ordem > 1;
+
+create unique index if not exists agent_inbox_midia_nao_lida_aberto_unico
+  on public.agent_inbox_items (organization_id, kind)
+  where status = 'open' and kind = 'midia_nao_lida';
+
+-- ---- origem do negócio segue o canal da conversa (migration 0531) ----
+-- Negócio que nasceu de conversa do Instagram/Facebook gravado com
+-- source = 'whatsapp' passa a ter o canal da conversa. Critério e o que não se
+-- toca: cabeçalho da migration 0531. Idempotente.
+update public.crm_leads l
+   set source = c.channel
+  from public.crm_lead_activities a
+  join public.conversations c
+    on c.organization_id = a.organization_id
+   and c.id = a.source_id
+ where a.organization_id = l.organization_id
+   and a.lead_id = l.id
+   and a.type = 'lead_created'
+   and a.source_module = 'canal.ingest'
+   and c.channel <> 'whatsapp'
+   and l.source = 'whatsapp';
+
+-- ---- tipo do envio no trace (migration 0535) ----
+-- O trace passa a dizer se a tentativa vetada era RESPOSTA ou DISPARO (#2112).
+-- NULL-ável de propósito: linha anterior à 0535 é legado e continua lida como
+-- resposta (o que o código de antes assumia); `null` passa no CHECK. CHECK de
+-- vocabulário fechado (`resposta`/`disparo`), espelho de `TipoDeEnvio` em
+-- lib/agent-engine/guardrails/before-send.ts. Idempotente.
+alter table public.before_send_traces
+  add column if not exists tipo_envio text;
+
+do $$ begin
+  if not exists (select 1 from pg_constraint
+                  where conname = 'before_send_traces_tipo_envio_check'
+                    and conrelid = 'public.before_send_traces'::regclass) then
+    alter table public.before_send_traces
+      add constraint before_send_traces_tipo_envio_check
+      check (tipo_envio in ('resposta', 'disparo'));
+  end if;
+end $$;
