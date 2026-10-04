@@ -41,7 +41,7 @@ import {
 
 import { aplicarEfeitosPosEntrada } from "../pos-entrada";
 
-import { completarLocalizacao } from "./localizacao";
+import { completarLocalizacao, pedirNovaBuscaDoPino, pinoFicouSemCoordenadas } from "./localizacao";
 import { parseZernioInbound, type ZernioIdentity, type ZernioInboundMessage } from "./webhook";
 
 export interface ZernioIngestResult {
@@ -202,6 +202,9 @@ export async function ingestZernioInbound(
           inseridaNaExistente,
         );
       }
+      if (!input.socialMessage && pinoFicouSemCoordenadas(msg)) {
+        await pedirNovaBuscaDoPino(admin, input.organizationId, inseridaNaExistente, msg);
+      }
       await efeitosDaEntrada(
         admin,
         input,
@@ -277,6 +280,9 @@ export async function ingestZernioInbound(
   if (msg.attachments[0]?.url) {
     await pedirPersistenciaDaMidia(admin, input.organizationId, conversationId, inserted);
   }
+  if (!input.socialMessage && pinoFicouSemCoordenadas(msg)) {
+    await pedirNovaBuscaDoPino(admin, input.organizationId, inserted, msg);
+  }
   await efeitosDaEntrada(admin, input, msg, contactId, conversationId, inserted);
 
   // SAÍDA feita por fora do CRM = uma pessoa respondeu o cliente à mão (celular,
@@ -310,7 +316,12 @@ export async function ingestZernioInbound(
  */
 async function efeitosDaEntrada(
   admin: SupabaseClient,
-  input: { organizationId: string; channelSessionId: string; requestId?: string },
+  input: {
+    organizationId: string;
+    channelSessionId: string;
+    requestId?: string;
+    socialMessage?: Pick<SocialMessage, "platform">;
+  },
   msg: ZernioInboundMessage,
   contactId: string,
   conversationId: string,
@@ -340,6 +351,9 @@ async function efeitosDaEntrada(
     nomeDoContato: msg.identity.displayName,
     requestId: input.requestId,
     origem: "zernio_webhook",
+    // A rede é o canal que os dois ramos acima já gravaram em
+    // `conversations.channel`; sem ela o negócio nasce como WhatsApp.
+    canal: input.socialMessage?.platform,
   });
 }
 
