@@ -45,7 +45,7 @@ function clientDoAplicativo(accessToken: string): SupabaseClient {
         urlDoSupabaseNoServidor(env.SUPABASE_SERVER_URL, env.NEXT_PUBLIC_SUPABASE_URL),
         env.NEXT_PUBLIC_SUPABASE_URL,
       ),
-      headers: { Authorization: `Bearer ${accessToken}`, "X-Client-Info": "deskcomm-crm/mobile" },
+      headers: { Authorization: `Bearer ${accessToken}`, "X-Client-Info": "mobile-client" },
     },
   });
 }

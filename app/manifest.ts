@@ -7,6 +7,11 @@ import { marcaDaSaida } from "@/lib/branding/saida";
 // async, sozinha, ainda pode ser prerenderizada com o nome de fallback do build.
 export const dynamic = "force-dynamic";
 
+// A especificação Web App Manifest permite combinar os dois propósitos. As
+// tipagens do Next modelam apenas cada valor isolado, então mantemos o valor
+// emitido pelo manifest separado da limitação de tipo local.
+const PURPOSE_DO_ICONE = "any maskable" as never;
+
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const marca = await marcaDaSaida(null);
   const linha = await marcaDaInstalacao();
@@ -24,13 +29,13 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
         src: `/app-icon/192${versao}`,
         sizes: "192x192",
         type: "image/png",
-        purpose: "maskable",
+        purpose: PURPOSE_DO_ICONE,
       },
       {
         src: `/app-icon/512${versao}`,
         sizes: "512x512",
         type: "image/png",
-        purpose: "maskable",
+        purpose: PURPOSE_DO_ICONE,
       },
     ],
   };
