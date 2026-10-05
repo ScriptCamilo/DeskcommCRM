@@ -150,6 +150,7 @@ import { garantirPerguntaDoRoteiro, perguntaDoRoteiroPodeSair, prepararRoteiroDo
 import { validarRespostaDoFluxo } from './flow-validate';
 import { moduloLigadoComMemo } from '@/lib/instalacao/modulos';
 import { msAteAJanelaAbrir } from './janela-de-atendimento';
+import { enviaAvisoForaDoHorario, portasDeProducao } from './aviso-fora-do-horario';
 import { janelaDeEnvioAberta, proximaAberturaDaJanela } from '../pacing/engine';
 import { loadChannelKnobs } from '../pacing/store';
 import { avisarJanelaFechada, resolverAvisoDeJanela } from '../pacing/aviso-de-janela';
@@ -203,6 +204,7 @@ import {
 import { diffCheckpoint } from '@/lib/leads/checkpoint-diff';
 import { emitAgentActivityForContact } from '@/lib/leads/agent-activity';
 import { resolveActiveLeadForContact, type LeadCandidate } from '@/lib/leads/active-lead';
+import { aplicaDestinoDaIntencao } from './destino-da-intencao';
 import { recalculaScoreDoLead } from '@/lib/leads/score-writer';
 import {
   JAILBREAK_ESCALATION_LEVEL,
@@ -2035,6 +2037,10 @@ async function executarTurnoDoAgente(
         inbound: liveJob().kind === 'inbound_turn',
       }, { log: runLog, jev: deps.jev });
   const agentConfig = routed.config;
+  // #2155 — o destino do card. `in` porque o ramo de preview/campanha devolve um
+  // objeto literal SEM estes campos: sem a guarda, o tipo da união recusa a leitura.
+  const destinoPipelineId = 'destinationPipelineId' in routed ? (routed.destinationPipelineId ?? null) : null;
+  const destinoStageId = 'destinationStageId' in routed ? (routed.destinationStageId ?? null) : null;
   if (
     !preview &&
     agentConfig?.operationMode === 'assisted' &&
@@ -2115,6 +2121,37 @@ async function executarTurnoDoAgente(
   if (!preview && liveJob().kind === 'inbound_turn' && agentConfig?.janelaDeAtendimento != null) {
     const esperaMs = msAteAJanelaAbrir(agentConfig.janelaDeAtendimento, clock());
     if (esperaMs !== null) {
+      // O AVISO DE FORA DO HORÁRIO (#1926) — ANTES do adiamento, para sair na
+      // hora em que a mensagem chegou. É resposta a quem escreveu primeiro (o
+      // pacing lê a janela `resposta*` e o aviso CONTA no ledger); as réguas de
+      // opt-out, teto de envio e LGPD continuam valendo — a ordem e os vetores
+      // moram em `aviso-fora-do-horario.ts`. Qualquer erro aqui só PERDE um
+      // aviso: o turno é adiado de qualquer forma, e a resposta não pode morrer
+      // por causa de um recado.
+      try {
+        const aviso = await enviaAvisoForaDoHorario(
+          portasDeProducao(pool, deps.crmCfg.supabase, runLog),
+          {
+            organizationId: tenantId,
+            conversationId: input.conversationId,
+            contactId: leadId,
+            channelSessionId: input.channelSessionId,
+            texto: agentConfig.avisoForaDoHorario ?? null,
+            janela: agentConfig.janelaDeAtendimento,
+            agora: clock(),
+          },
+        );
+        runLog.info(
+          aviso.enviar
+            ? 'aviso de fora do horário enviado'
+            : 'aviso de fora do horário não enviado',
+          { motivo: aviso.enviar ? 'enviado' : aviso.motivo },
+        );
+      } catch (err) {
+        runLog.warn('aviso de fora do horário falhou — o turno segue adiado para a abertura', {
+          error: (err instanceof Error ? err.message : String(err)).slice(0, 200),
+        });
+      }
       await rescheduleJob(pool, liveJob().id, ctx.workerId, {
         acquiredAt: claimOfJob(liveJob())?.acquired_at,
         delayMs: esperaMs,
@@ -2170,6 +2207,48 @@ async function executarTurnoDoAgente(
     } catch (err) {
       runLog.warn('decisão do router não gravada', {
         error: (err instanceof Error ? err.message : String(err)).slice(0, 120),
+      });
+    }
+  }
+  // #2155 — A INTENÇÃO TAMBÉM DIZ PARA ONDE O CARD VAI. O roteador escolhia o
+  // agente e o card ficava no funil de entrada: o agente do produto não escrevia
+  // nele, a conversa morria no time errado. Aplicado DEPOIS da decisão de
+  // roteamento (mesmo agente, mesma intenção) e ANTES do turno do agente, para
+  // que ele já responda com o card no funil certo. Silencioso por design: card
+  // já no destino, destino já ocupado e alvo ambíguo não são erro (ver
+  // `destino-da-intencao.ts`).
+  if (!preview && destinoPipelineId !== null) {
+    try {
+      const destino = await aplicaDestinoDaIntencao({
+        admin: deps.crmCfg.supabase,
+        organizationId: tenantId,
+        contactId: leadId,
+        destinoPipelineId,
+        destinoStageId,
+        handlerCtx: {
+          organization_id: tenantId,
+          actor: {
+            type: 'ai_agent',
+            id: 'agent-engine',
+            role: 'ai_operator',
+            ...(agentConfig === null ? {} : { agent_id: agentConfig.agentId }),
+          },
+          requestId: liveJob().id,
+        },
+      });
+      runLog.info('destino da intenção aplicado', {
+        status: destino.status,
+        pipeline_id: destinoPipelineId,
+        intent: routed.intentName,
+        ...(destino.error === undefined ? {} : { error: destino.error }),
+        ...(destino.origemId === undefined ? {} : { origem: destino.origemId }),
+        ...(destino.cloneId === undefined ? {} : { clone: destino.cloneId }),
+      });
+    } catch (err) {
+      // Nunca derruba a resposta ao lead por causa do destino do card.
+      runLog.warn('destino da intenção não aplicado', {
+        error: (err instanceof Error ? err.message : String(err)).slice(0, 160),
+        pipeline_id: destinoPipelineId,
       });
     }
   }
@@ -2699,6 +2778,9 @@ async function executarTurnoDoAgente(
   // as tools do modelo rodam em passos anteriores do mesmo loop, o valor já está certo
   // quando o modelo decide mandar a resposta.
   let agendaToolCalledThisTurn = false;
+  // Lido pelo `casePromiseGate` (#1873): true só depois de `schedule_followup` AGENDAR com
+  // sucesso neste turno. Libera apenas a promessa de retorno do próprio assistente.
+  let followupAgendadoNesteTurno = false;
   const outcomes: ChannelSendResult[] = [];
   // Citações acumuladas por buscas de conhecimento DESTE turno — anexadas à
   // próxima outbound enviada (shape de lib/ai/citations/types, que a UI já lê).
@@ -3177,6 +3259,10 @@ async function executarTurnoDoAgente(
               active: agentConfig !== null && temFerramentaDeAgenda(agentConfig.toolIds),
               ferramentas: agentConfig === null ? [] : ferramentasDeAgendaDoAgente(agentConfig.toolIds),
               toolCalledThisTurn: agendaToolCalledThisTurn,
+            },
+            followup: {
+              disponivel: rawTools.schedule_followup !== undefined,
+              agendadoNesteTurno: followupAgendadoNesteTurno,
             },
             ...(deps.knobs.disclosureMode !== undefined
               ? { disclosureMode: deps.knobs.disclosureMode }
@@ -3698,6 +3784,7 @@ async function executarTurnoDoAgente(
           if (!res.ok) {
             return res; // erro de ensino (payload / data no passado / fora da janela)
           }
+          followupAgendadoNesteTurno = true;
           return {
             ok: true,
             status: 'agendado',

@@ -16,13 +16,7 @@
  * runtime em vez de lida do bundle.
  */
 
-/**
- * Identidade-base distribuída por este fork.
- *
- * A instalação ainda pode substituir nome, logo, ícone e cor pela tela de
- * Marca; esta constante só é o fallback para a primeira inicialização.
- */
-export const DEFAULT_APP_NAME = "ChantiCRM";
+export const DEFAULT_APP_NAME = "DeskcommCRM";
 
 export type Branding = {
   /** Nome exibido na interface e nos títulos de página. */
@@ -78,10 +72,10 @@ export function resolveBranding(
  * renderizava o nome em `<span>` e o cliente hidratava um `<img>`: troca de tipo
  * de elemento, React #418 em toda tela, árvore descartada e regerada.
  *
- * No servidor esta função continua sendo a leitura direta do fallback de
- * ambiente. As páginas públicas usam `marcaDaSaida(null)`, que coloca a marca
- * persistida acima desse fallback; assim uma variável reservada pelo
- * orquestrador não pode substituir a marca já configurada pela instalação.
+ * No SERVIDOR esta função continua lendo somente o `.env`. Páginas que precisam
+ * refletir a marca editada na tela devem usar `marcaDaSaida()` — por exemplo, o
+ * login, cujo texto precisa acompanhar o título da aba. Os demais call sites
+ * deste helper mantêm explicitamente o comportamento de fallback do ambiente.
  *
  * O ramo do navegador continua de pé porque a alternativa é pior: sem ele, um
  * client component que voltasse a chamar `branding()` cairia no padrão do

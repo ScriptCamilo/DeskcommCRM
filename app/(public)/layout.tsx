@@ -30,9 +30,16 @@ import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
  * para que `tests/e2e/marca-logo.spec.ts` continue medindo "a fachada está sem
  * `<img>`" como "sem logo do revendedor".
  *
- * O nome sob "Entrar" usa a mesma resolução desta fachada. Além de manter o
- * título e o conteúdo coerentes, isso impede que uma variável reservada do
- * orquestrador de deploy apareça como marca quando o banco já foi configurado.
+ * O conteúdo de cada página resolve o próprio nome. A tela de login usa
+ * `marcaDaSaida(null)`, como o título da aba, para que a marca alterada pela
+ * instalação apareça também sob o botão "Entrar"; a casca usa a mesma resolução
+ * para logo e tema.
+ *
+ * Com o login e a aba na MESMA pilha, `tests/e2e/icone-da-marca.spec.ts` deixou
+ * de cruzar duas resoluções independentes: ele só prova que as duas concordam.
+ * O que ancora o nome numa verdade de fora da pilha é o caso "o nome trocado em
+ * /admin/marca…" de `tests/e2e/marca-logo.spec.ts`, que digita o nome na tela e
+ * o confere no login de quem não entrou. Não apague um sem o outro.
  */
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const marca = await marcaDaSaida(null);

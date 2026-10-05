@@ -88,9 +88,12 @@ test.describe("o ícone e o título carregam a marca da instalação", () => {
     const marcaNoTitulo = casou?.[1] ?? "";
     expect(marcaNoTitulo.length).toBeGreaterThan(0);
 
-    // Título e texto sob "Entrar" usam a mesma marca resolvida da instalação.
-    // Isto impede que um nome interno injetado pelo orquestrador de deploy
-    // apareça no login depois que a marca já foi configurada.
+    // O título e o texto sob "Entrar" precisam refletir a mesma marca da
+    // instalação. ATENÇÃO: os dois leem hoje a MESMA pilha (`marcaDaSaida(null)`
+    // e `generateMetadata` → `marcaDaInstalacao()`), então esta asserção só
+    // prova que concordam entre si — um resolvedor quebrado deixa as duas
+    // erradas e iguais. A verdade independente (o nome digitado na tela chega
+    // ao login) está em `marca-logo.spec.ts`, "o nome trocado em /admin/marca…".
     await expect(page.getByText(marcaNoTitulo, { exact: true }).first()).toBeVisible();
   });
 });
