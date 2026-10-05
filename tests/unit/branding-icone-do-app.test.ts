@@ -5,6 +5,7 @@ vi.mock("@/lib/env", () => ({ env: { NEXT_PUBLIC_SUPABASE_URL: "https://storage.
 vi.mock("@/lib/logger", () => ({ logger: { warn: vi.fn() } }));
 vi.mock("@/lib/branding/saida", () => ({ NEUTROS_DE_SAIDA: { fundo: "#ffffff" } }));
 
+import { DEFAULT_APP_NAME } from "@/lib/branding";
 import { gerarIconeDoApp, lerArquivoDoIcone } from "@/lib/branding/icone-do-app";
 import { logger } from "@/lib/logger";
 import { TAMANHO_MAXIMO_DO_LOGO } from "@/lib/branding/logo";
@@ -81,7 +82,7 @@ describe("arquivo do ícone público da instalação", () => {
 
 describe("PNG real do aplicativo", () => {
   it.each([192, 512] as const)("renderiza o símbolo-base em %i×%i", async (lado) => {
-    const corpo = Buffer.from(await gerarIconeDoApp(lado, { ...marca, nome: "ChantiCRM" }, null));
+    const corpo = Buffer.from(await gerarIconeDoApp(lado, { ...marca, nome: DEFAULT_APP_NAME }, null));
     expect(corpo.subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
     expect(corpo.readUInt32BE(16)).toBe(lado);
     expect(corpo.readUInt32BE(20)).toBe(lado);
