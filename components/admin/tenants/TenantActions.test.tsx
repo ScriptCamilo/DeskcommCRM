@@ -13,6 +13,7 @@ vi.mock("./SuspendDialog", () => ({ SuspendDialog: () => null }));
 vi.mock("./ReactivateDialog", () => ({ ReactivateDialog: () => null }));
 vi.mock("./DeleteTenantDialog", () => ({ DeleteTenantDialog: () => null }));
 vi.mock("./EditTenantDialog", () => ({ EditTenantDialog: () => null }));
+vi.mock("./OwnerInviteRecovery", () => ({ OwnerInviteRecovery: () => null }));
 vi.mock("@/components/admin/ImpersonateButton", () => ({ ImpersonateButton: () => null }));
 
 import { TenantActions } from "./TenantActions";

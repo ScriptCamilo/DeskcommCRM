@@ -623,6 +623,9 @@ jobs:
         # consultas/hora por IP — o executor próprio é um IP só.
         env:
           GH_TOKEN: ${{ github.token }}
+          # Forks normalmente não publicam releases. Se `gh release view` não
+          # encontrar uma release no fork, o fallback consulta o upstream.
+          DESKCOMM_RELEASES_LATEST_URL: https://api.github.com/repos/melgarafael/DeskcommCRM/releases/latest
         run: pnpm test:db
 
       # O `update.sh` do cliente roda sobre um banco COM DADOS, e nenhum gate

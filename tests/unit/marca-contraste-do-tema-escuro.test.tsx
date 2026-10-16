@@ -86,6 +86,7 @@ const FORM_GRAVADA = {
   accent_hex: "#1c261d",
   accent_dark_hex: "#d9ac62",
   show_powered_by: false,
+  support_email: null,
 } as const;
 
 function renderizarFormulario(corPrincipal: string, corEscura: string | null) {
